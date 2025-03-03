@@ -10,7 +10,7 @@ from homeassistant.components.bluetooth.active_update_coordinator import ActiveB
 from homeassistant.core import CoreState, HomeAssistant, callback
 from bleak.backends.device import BLEDevice
 
-from .generic_bt_api.device import GenericBTDevice
+from .glowdreaming_api.device import GenericBTDevice
 from .const import DOMAIN, DEVICE_STARTUP_TIMEOUT_SECONDS
 
 _LOGGER = logging.getLogger(__name__)

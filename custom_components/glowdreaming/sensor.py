@@ -40,11 +40,16 @@ class GlowdreamingSensor(GlowdreamingEntity, SensorEntity):
             "data": "UNKNOWN"
         }
 
+    def connection_state(self):
+        if self._device.connected:
+            return "Connected"
+        else:
+            return "Disconnected"
+
     @property
     def is_on(self):
         return self._device.connected
 
-    # Set the state of the sensor
     @property
     def state(self):
         """Return the state of the sensor."""
@@ -53,7 +58,10 @@ class GlowdreamingSensor(GlowdreamingEntity, SensorEntity):
     @property
     def extra_state_attributes(self):
         """Return the state attributes of the sensor."""
-        return self._attributes
+        return {
+            **self._attributes,
+            "connected": self.connection_state()
+        }
 
     async def set_mode(self, target_uuid, mode):
         await self._device.set_mode(target_uuid, mode)

@@ -10,7 +10,7 @@ from homeassistant.exceptions import ConfigEntryNotReady
 
 from .const import DOMAIN
 from .coordinator import GenericBTCoordinator
-from .generic_bt_api.device import GenericBTDevice
+from .glowdreaming_api.device import GenericBTDevice
 
 _LOGGER = logging.getLogger(__name__)
 

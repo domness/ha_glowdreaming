@@ -16,6 +16,22 @@ def get_mode_from_string(value: str):
     else:
         return "Unknown"
 
+def gatt_from_mode(mode: str):
+    # - "off"
+    # - "noise_quiet"
+    # - "noise_medium"
+    # - "noise_loud"
+    if mode == "off":
+        return "INSERT_HEX_VALUE_HERE"
+    elif mode == "noise_quiet":
+        return "INSERT_HEX_VALUE_HERE"
+    elif mode == "noise_medium":
+        return "INSERT_HEX_VALUE_HERE"
+    elif mode == "noise_loud":
+        return "INSERT_HEX_VALUE_HERE"
+    else:
+        return "INSERT_HEX_VALUE_HERE"
+
 class GenericBTDevice:
     """Generic BT Device Class"""
     def __init__(self, ble_device):
@@ -40,10 +56,6 @@ class GenericBTDevice:
     def state(self):
         return self._state
 
-    # @property
-    # def mode(self):
-    #     return self._mode
-
     @property
     def bt_mode(self):
         return self._bt_mode
@@ -65,6 +77,8 @@ class GenericBTDevice:
 
     async def set_mode(self, target_uuid, mode):
         await self.get_client()
+        # gatt_from_mode(mode)
+        # await self.write_gatt(target_uuid, gatt_from_mode(mode))
         _LOGGER.debug("Setting mode", target_uuid, mode)
 
     async def write_gatt(self, target_uuid, data):

@@ -16,7 +16,6 @@ class Schema(Enum):
             vol.Required("mode"): cv.string
         }
     )
-
     WRITE_GATT = make_entity_service_schema(
         {
             vol.Required("target_uuid"): cv.string,
