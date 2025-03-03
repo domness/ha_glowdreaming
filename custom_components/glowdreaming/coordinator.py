@@ -15,7 +15,7 @@ from .const import DOMAIN, DEVICE_STARTUP_TIMEOUT_SECONDS
 
 _LOGGER = logging.getLogger(__name__)
 
-class GenericBTCoordinator(ActiveBluetoothDataUpdateCoordinator[None]):
+class BTCoordinator(ActiveBluetoothDataUpdateCoordinator[None]):
     """Class to manage fetching generic bt data."""
 
     def __init__(self, hass: HomeAssistant, logger: logging.Logger, ble_device: BLEDevice, device: GlowdreamingDevice, device_name: str, base_unique_id: str, connectable: bool) -> None:

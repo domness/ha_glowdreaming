@@ -9,12 +9,12 @@ from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import ConfigEntryNotReady
 
 from .const import DOMAIN
-from .coordinator import GenericBTCoordinator
+from .coordinator import BTCoordinator
 from .glowdreaming_api.device import GlowdreamingDevice
 
 _LOGGER = logging.getLogger(__name__)
 
-PLATFORMS = [Platform.SENSOR]
+PLATFORMS = [Platform.SENSOR, Platform.LIGHT]
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Set up Generic BT from a config entry."""
@@ -27,7 +27,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         raise ConfigEntryNotReady(f"Could not find Generic BT Device with address {address}")
     device = GlowdreamingDevice(ble_device)
 
-    coordinator = hass.data[DOMAIN][entry.entry_id] = GenericBTCoordinator(hass, _LOGGER, ble_device, device, entry.title, entry.unique_id, True)
+    coordinator = hass.data[DOMAIN][entry.entry_id] = BTCoordinator(hass, _LOGGER, ble_device, device, entry.title, entry.unique_id, True)
     entry.async_on_unload(coordinator.async_start())
 
     if not await coordinator.async_wait_ready():

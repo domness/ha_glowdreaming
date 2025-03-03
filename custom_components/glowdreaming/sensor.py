@@ -10,7 +10,7 @@ from homeassistant.helpers import entity_platform
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from .const import DOMAIN, Schema
-from .coordinator import GenericBTCoordinator
+from .coordinator import BTCoordinator
 from .entity import GlowdreamingEntity
 
 # Initialize the logger
@@ -19,7 +19,7 @@ PARALLEL_UPDATES = 0
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry, async_add_entities: AddEntitiesCallback) -> None:
     """Set up Glowdreaming device based on a config entry."""
-    coordinator: GenericBTCoordinator = hass.data[DOMAIN][entry.entry_id]
+    coordinator: BTCoordinator = hass.data[DOMAIN][entry.entry_id]
     async_add_entities([GlowdreamingSensor(coordinator)])
 
     platform = entity_platform.async_get_current_platform()
@@ -30,7 +30,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry, async_add_e
 class GlowdreamingSensor(GlowdreamingEntity, SensorEntity):
     """Representation of a Glowdreaming Sensor."""
 
-    def __init__(self, coordinator: GenericBTCoordinator) -> None:
+    def __init__(self, coordinator: BTCoordinator) -> None:
         """Initialize the Device."""
         super().__init__(coordinator)
         self._attributes = {
@@ -70,5 +70,5 @@ class GlowdreamingSensor(GlowdreamingEntity, SensorEntity):
 
     async def read_gatt(self, target_uuid):
         await self._device.read_gatt(target_uuid)
-        self._attributes['data'] = self._device.bt_mode
+        self._attributes['data'] = self._device._state_hex
         self.async_write_ha_state()

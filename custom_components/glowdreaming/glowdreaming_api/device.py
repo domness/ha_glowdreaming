@@ -4,11 +4,12 @@ from uuid import UUID
 import asyncio
 import logging
 from contextlib import AsyncExitStack
+from enum import StrEnum
 
 from bleak import BleakClient
 from bleak.exc import BleakError
 
-from enum import StrEnum
+from .const import *
 
 class GDModeCommand(StrEnum):
     """Glowdreaming Mode Command"""
@@ -44,11 +45,21 @@ class GlowdreamingDevice:
         self._client: BleakClient | None = None
         self._client_stack = AsyncExitStack()
         self._lock = asyncio.Lock()
-        self._bt_mode: str = ""
+        self._state_hex: str = ""
         self._state: str = "unknown"
 
+        self._volume = None
+        self._brightness = None
+        self._color = None
+
     async def update(self):
-        pass
+        _LOGGER.debug("Update called")
+        response = await self.read_gatt(CHAR_CHARACTERISTIC)
+        self._refresh_data(response)
+
+    def _refresh_data(self, response_data) -> None:
+        self._state_hex = response_data.hex()
+        self._state = get_mode_from_string(response_data.hex())
 
     async def stop(self):
         pass
@@ -62,23 +73,42 @@ class GlowdreamingDevice:
         return self._state
 
     @property
-    def bt_mode(self):
-        return self._bt_mode
+    def state_hex(self):
+        return self._state_hex
+
+    @property
+    def volume(self):
+        return self._volume
+
+    @property
+    def brightness(self):
+        return self._brightness
+
+    @property
+    def color(self):
+        return self._color
 
     async def get_client(self):
+        def disconnected_callback(client):
+            _LOGGER.info("Disconnected callback called!")
+            self._client = None
+
         async with self._lock:
             if not self._client:
                 _LOGGER.debug("Connecting")
                 try:
-                    self._client = await self._client_stack.enter_async_context(BleakClient(self._ble_device, timeout=30))
+                    self._client = await self._client_stack.enter_async_context(
+                        BleakClient(self._ble_device, timeout=60, disconnected_callback=disconnected_callback))
+                    _LOGGER.debug("Made new connection")
                 except asyncio.TimeoutError as exc:
                     _LOGGER.debug("Timeout on connect", exc_info=True)
-                    raise IdealLedTimeout("Timeout on connect") from exc
+                    raise
                 except BleakError as exc:
                     _LOGGER.debug("Error on connect", exc_info=True)
-                    raise IdealLedBleakError("Error on connect") from exc
+                    raise
             else:
                 _LOGGER.debug("Connection reused")
+
 
     async def set_mode(self, target_uuid, mode):
         await self.get_client()
@@ -100,8 +130,7 @@ class GlowdreamingDevice:
         data = await self._client.read_gatt_char(uuid)
         _LOGGER.debug("Reading Gatt", data)
         print(data)
-        self._bt_mode = data.hex()
-        self._state = get_mode_from_string(data.hex())
+        self._refresh_data(data)
         return data
 
     def update_from_advertisement(self, advertisement):
