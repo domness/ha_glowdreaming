@@ -8,6 +8,15 @@ from contextlib import AsyncExitStack
 from bleak import BleakClient
 from bleak.exc import BleakError
 
+from enum import StrEnum
+
+class GDModeCommand(StrEnum):
+    """Glowdreaming Mode Command"""
+    OFF = "HEX1"
+    NOISE_QUIET = "HEX2"
+    NOISE_MEDIUM = "HEX3"
+    NOISE_LOUD = "HEX4"
+
 _LOGGER = logging.getLogger(__name__)
 
 def get_mode_from_string(value: str):
@@ -17,22 +26,18 @@ def get_mode_from_string(value: str):
         return "Unknown"
 
 def gatt_from_mode(mode: str):
-    # - "off"
-    # - "noise_quiet"
-    # - "noise_medium"
-    # - "noise_loud"
     if mode == "off":
-        return "INSERT_HEX_VALUE_HERE"
+        return GDModeCommand.OFF
     elif mode == "noise_quiet":
-        return "INSERT_HEX_VALUE_HERE"
+        return GDModeCommand.NOISE_QUIET
     elif mode == "noise_medium":
-        return "INSERT_HEX_VALUE_HERE"
+        return GDModeCommand.NOISE_MEDIUM
     elif mode == "noise_loud":
-        return "INSERT_HEX_VALUE_HERE"
+        return GDModeCommand.NOISE_LOUD
     else:
-        return "INSERT_HEX_VALUE_HERE"
+        return ""
 
-class GenericBTDevice:
+class GlowdreamingDevice:
     """Generic BT Device Class"""
     def __init__(self, ble_device):
         self._ble_device = ble_device

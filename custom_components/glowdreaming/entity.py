@@ -13,7 +13,7 @@ _LOGGER = logging.getLogger(__name__)
 class GlowdreamingEntity(PassiveBluetoothCoordinatorEntity[GenericBTCoordinator]):
     """Generic entity encapsulating common features of Generic BT device."""
 
-    _device: GenericBTDevice
+    _device: GlowdreamingDevice
     _attr_has_entity_name = True
 
     def __init__(self, coordinator: GenericBTCoordinator) -> None:

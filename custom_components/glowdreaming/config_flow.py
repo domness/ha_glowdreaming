@@ -13,7 +13,7 @@ from homeassistant.const import CONF_ADDRESS
 from homeassistant.data_entry_flow import FlowResult
 
 from .const import DOMAIN
-from .glowdreaming_api.device import GenericBTDevice
+from .glowdreaming_api.device import GlowdreamingDevice
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -48,7 +48,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             local_name = discovery_info.name
             await self.async_set_unique_id(discovery_info.address, raise_on_progress=False)
             self._abort_if_unique_id_configured()
-            device = GenericBTDevice(discovery_info.device)
+            device = GlowdreamingDevice(discovery_info.device)
             try:
                 await device.update()
             except BLEAK_EXCEPTIONS:
