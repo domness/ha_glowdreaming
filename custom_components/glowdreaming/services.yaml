@@ -1,3 +1,22 @@
+set_mode:
+  name: "Set Mode"
+  description: "Set the mode of the device"
+  target:
+    entity:
+      domain: sensor
+      integration: glowdreaming
+  fields:
+    mode:
+      name: "Mode"
+      description: "Mode to set"
+      required: true
+      selector:
+        select:
+          options:
+            - "off"
+            - "noise_quiet"
+            - "noise_medium"
+            - "noise_loud"
 write_gatt:
   name: Write Data into Target UUID
   description: Write Data into Target UUID
