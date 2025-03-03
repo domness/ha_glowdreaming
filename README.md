@@ -1,2 +1,2 @@
-# ha_glowdreaming
+# Home Assistant - Glowdreaming
 
