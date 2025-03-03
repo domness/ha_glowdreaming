@@ -8,7 +8,6 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import entity_platform
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
-from homeassistant.const import STATE_UNKNOWN
 
 from .const import DOMAIN, Schema
 from .coordinator import GenericBTCoordinator
@@ -30,8 +29,6 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry, async_add_e
 
 class GlowdreamingSensor(GlowdreamingEntity, SensorEntity):
     """Representation of a Glowdreaming Sensor."""
-
-    _attr_name = None
 
     def __init__(self, coordinator: GenericBTCoordinator) -> None:
         """Initialize the Device."""
@@ -74,5 +71,4 @@ class GlowdreamingSensor(GlowdreamingEntity, SensorEntity):
     async def read_gatt(self, target_uuid):
         await self._device.read_gatt(target_uuid)
         self._attributes['data'] = self._device.bt_mode
-        # self._attributes['mode'] = self._device.state
         self.async_write_ha_state()
