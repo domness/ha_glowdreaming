@@ -92,6 +92,10 @@ class GlowdreamingDevice:
         return self._power
 
     @property
+    def sound(self) -> GDSound:
+        return self._sound
+
+    @property
     def volume(self):
         return self._volume
 
@@ -156,12 +160,12 @@ class GlowdreamingDevice:
         self._refresh_data(data)
         return data
 
-    async def set_mode(self, target_uuid, mode):
-        await self.get_client()
-        # TODO: Split all of this out into separate commands once worked out the permutations
-        # gatt_from_mode(mode)
-        # await self.send_command(gatt_from_mode(mode))
-        _LOGGER.debug("Setting mode", target_uuid, mode)
+    # async def set_mode(self, target_uuid, mode):
+    #     await self.get_client()
+    #     # TODO: Split all of this out into separate commands once worked out the permutations
+    #     # gatt_from_mode(mode)
+    #     # await self.send_command(gatt_from_mode(mode))
+    #     _LOGGER.debug("Setting mode", target_uuid, mode)
 
     async def send_command(self, data) -> None:
         await self.write_gatt(CHAR_CHARACTERISTIC, data)
@@ -182,33 +186,19 @@ class GlowdreamingDevice:
 
         # New World:
         power = bool(4 & int(response[9], 16)) # 4 is on
-        self._power = power
-
         volume = int(response[3], 16)
-        self._volume = volume
 
-        sound = GDSound.white_noise
-        self._sound = sound
-
-        # high: 100
-        # medium: 40
-        # low: 10
         red, green, blue = [int(x, 16) for x in response[0:3]]
+        brightness = max(red, green, blue)
         red_color = 255 if red > 0 else 0
         green_color = 255 if green > 0 else 0
         blue_color = 255 if blue > 0 else 0
 
+        self._power = power
+        self._volume = volume
+        self._sound = GDSound.white_noise
         self._color = (red_color, green_color, blue_color)
-        brightness = max(red, green, blue)
-        self._brightness = brightness
-
-        # off
-        # 0a0000010001000000040044
-        # 000000000001000000000044
-        # bytearray(b'\x00\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00D')
-        # hex_string = "000000000001000000000044"
-        # byte_array = bytearray.fromhex(hex_string)
-        # print(byte_array)
+        self._brightness = round(255 / 100 * brightness)
 
         _LOGGER.debug(f"Power state is {self._power}")
         _LOGGER.debug(f"Volume state is {self._volume}")

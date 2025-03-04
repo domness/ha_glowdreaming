@@ -55,5 +55,15 @@ class GlowdreamingMediaPlayer(BTEntity, MediaPlayerEntity):
         return [sound.name.capitalize() for sound in GDSound]
 
     @property
+    def state(self) -> MediaPlayerState | None:
+        if self._device.volume > 0:
+            return MediaPlayerState.PLAYING
+        return MediaPlayerState.OFF
+
+    @property
+    def source(self) -> str | None:
+        return self._device.sound.name.capitalize()
+
+    @property
     def volume_level(self) -> float | None:
         return float(self._device.volume / 3)

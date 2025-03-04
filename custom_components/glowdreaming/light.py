@@ -58,8 +58,8 @@ class GlowdreamingLight(BTEntity, LightEntity):
 
     @property
     def is_on(self) -> bool | None:
-        """Return true if light is on."""
-        return self._device.power
+        """Return true if brightness is greater than zero"""
+        return self._device.brightness > 0
 
     @property
     def color(self):

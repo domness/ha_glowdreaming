@@ -17,3 +17,7 @@
 ## Setting up the integration
 
 TODO
+
+## Bluetooth Data
+
+TODO
