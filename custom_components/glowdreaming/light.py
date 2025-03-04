@@ -34,9 +34,15 @@ class GlowdreamingLight(GlowdreamingEntity, LightEntity):
         """Initialize the Device."""
         super().__init__(coordinator)
 
+        self._name = "Light"
         self._state = None
         self._brightness = None
         self._color = None
+
+    @property
+    def name(self) -> str:
+        """Return the display name of this light."""
+        return self._name
 
     @property
     def brightness(self):

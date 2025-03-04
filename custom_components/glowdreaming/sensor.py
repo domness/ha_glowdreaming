@@ -33,6 +33,8 @@ class GlowdreamingSensor(GlowdreamingEntity, SensorEntity):
     def __init__(self, coordinator: BTCoordinator) -> None:
         """Initialize the Device."""
         super().__init__(coordinator)
+
+        self._name = "Sensor"
         self._attributes = {
             "data": "UNKNOWN"
         }
@@ -42,6 +44,10 @@ class GlowdreamingSensor(GlowdreamingEntity, SensorEntity):
             return "Connected"
         else:
             return "Disconnected"
+
+    @property
+    def name(self):
+        return self._name
 
     @property
     def is_on(self):

@@ -32,16 +32,16 @@ class BTCoordinator(ActiveBluetoothDataUpdateCoordinator[None]):
     def _needs_poll(self, service_info: bluetooth.BluetoothServiceInfoBleak, seconds_since_last_poll: float | None) -> bool:
         # Only poll if hass is running, we need to poll,
         # and we actually have a way to connect to the device
-        # return False
-        return (
-            self.hass.state == CoreState.running
-            and self.device.poll_needed(seconds_since_last_poll)
-            and bool(
-                bluetooth.async_ble_device_from_address(
-                    self.hass, service_info.device.address, connectable=True
-                )
-            )
-        )
+        return False
+        # return (
+        #     self.hass.state == CoreState.running
+        #     and self.device.poll_needed(seconds_since_last_poll)
+        #     and bool(
+        #         bluetooth.async_ble_device_from_address(
+        #             self.hass, service_info.device.address, connectable=True
+        #         )
+        #     )
+        # )
 
     async def _async_update(self, service_info: bluetooth.BluetoothServiceInfoBleak) -> None:
         """Poll the device."""

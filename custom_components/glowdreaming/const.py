@@ -8,6 +8,9 @@ import homeassistant.helpers.config_validation as cv
 DOMAIN = "glowdreaming"
 DEVICE_STARTUP_TIMEOUT_SECONDS = 30
 
+class GlowdreamingSound(Enum):
+    WHITE_NOISE = 1
+
 class Schema(Enum):
     """General used service schema definition"""
 
