@@ -50,14 +50,12 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             self._abort_if_unique_id_configured()
             device = GlowdreamingDevice(discovery_info.device)
             try:
-                await device.update()
-            except BLEAK_EXCEPTIONS:
-                errors["base"] = "cannot_connect"
+                await device.get_client()
             except Exception:  # pylint: disable=broad-except
                 _LOGGER.exception("Unexpected error")
                 errors["base"] = "unknown"
             else:
-                await device.stop()
+                await device.disconnect()
                 return self.async_create_entry(title=local_name,data={CONF_ADDRESS: discovery_info.address})
 
         if discovery := self._discovery_info:

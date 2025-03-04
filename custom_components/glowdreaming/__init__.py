@@ -14,39 +14,49 @@ from .glowdreaming_api.device import GlowdreamingDevice
 
 _LOGGER = logging.getLogger(__name__)
 
-PLATFORMS = [Platform.SENSOR, Platform.LIGHT]
+PLATFORMS = [Platform.SENSOR, Platform.LIGHT, Platform.MEDIA_PLAYER]
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Set up Generic BT from a config entry."""
     assert entry.unique_id is not None
     hass.data.setdefault(DOMAIN, {})
     address: str = entry.data[CONF_ADDRESS]
-    ble_device = bluetooth.async_ble_device_from_address(hass, address.upper(), True)
+
+    scanner = bluetooth.async_get_scanner(hass)
+    ble_device = bluetooth.async_ble_device_from_address(hass, address.upper())
 
     if not ble_device:
         raise ConfigEntryNotReady(f"Could not find Generic BT Device with address {address}")
+
     device = GlowdreamingDevice(ble_device)
+    await device.get_client()
 
-    coordinator = hass.data[DOMAIN][entry.entry_id] = BTCoordinator(hass, _LOGGER, ble_device, device, entry.title, entry.unique_id, True)
-    entry.async_on_unload(coordinator.async_start())
+    if not device.connected:
+        raise ConfigEntryNotReady(f"Failed to connect to: {ble_device.address}")
 
-    if not await coordinator.async_wait_ready():
-        raise ConfigEntryNotReady(f"{address} is not advertising state")
+    try:
+        coordinator = BTCoordinator(hass, _LOGGER, device, ble_device, entry.title, entry.unique_id)
 
-    entry.async_on_unload(entry.add_update_listener(_async_update_listener))
-    await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
+        await coordinator.async_config_entry_first_refresh()
 
-    return True
+        hass.data[DOMAIN][entry.entry_id] = coordinator
+        await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
 
-async def _async_update_listener(hass: HomeAssistant, entry: ConfigEntry) -> None:
-    """Handle options update."""
-    await hass.config_entries.async_reload(entry.entry_id)
+        return True
+    except:
+        _LOGGER.exception("Exception occured during setup; closing connection")
+        await device.disconnect()
+        raise
 
 async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Unload a config entry."""
+
+    device: GlowdreamingDevice = hass.data[DOMAIN][entry.entry_id].data
+    await device.disconnect()
+
     unload_ok = await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
 
-    if unload_ok:
+    if unload_ok := await hass.config_entries.async_unload_platforms(entry, PLATFORMS):
         hass.data[DOMAIN].pop(entry.entry_id)
         if not hass.config_entries.async_entries(DOMAIN):
             hass.data.pop(DOMAIN)

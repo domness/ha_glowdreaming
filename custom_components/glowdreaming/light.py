@@ -3,7 +3,8 @@ from __future__ import annotations
 
 import logging
 
-from homeassistant.components.light import LightEntity
+from homeassistant.components.light import (ATTR_BRIGHTNESS, ATTR_RGB_COLOR, ColorMode, PLATFORM_SCHEMA,
+                                            LightEntity)
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import entity_platform
@@ -11,7 +12,7 @@ from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from .const import DOMAIN, Schema
 from .coordinator import BTCoordinator
-from .entity import GlowdreamingEntity
+from .entity import BTEntity
 
 # Initialize the logger
 _LOGGER = logging.getLogger(__name__)
@@ -22,12 +23,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry, async_add_e
     coordinator: BTCoordinator = hass.data[DOMAIN][entry.entry_id]
     async_add_entities([GlowdreamingLight(coordinator)])
 
-    # platform = entity_platform.async_get_current_platform()
-    # platform.async_register_entity_service("set_mode", Schema.SET_MODE.value, "set_mode")
-    # platform.async_register_entity_service("write_gatt", Schema.WRITE_GATT.value, "write_gatt")
-    # platform.async_register_entity_service("read_gatt", Schema.READ_GATT.value, "read_gatt")
-
-class GlowdreamingLight(GlowdreamingEntity, LightEntity):
+class GlowdreamingLight(BTEntity, LightEntity):
     """Representation of a Glowdreaming Light."""
 
     def __init__(self, coordinator: BTCoordinator) -> None:
@@ -45,23 +41,34 @@ class GlowdreamingLight(GlowdreamingEntity, LightEntity):
         return self._name
 
     @property
-    def brightness(self):
-        """Return the brightness of the light.
+    def color_mode(self):
+        return ColorMode.RGB
 
-        This method is optional. Removing it indicates to Home Assistant
-        that brightness is not supported for this light.
-        """
-        return self._brightness
+    @property
+    def supported_color_modes(self):
+        return [ColorMode.RGB]
+
+    @property
+    def brightness(self):
+        return self._device.brightness
+
+    @property
+    def rgb_color(self):
+        return self._device.color
 
     @property
     def is_on(self) -> bool | None:
         """Return true if light is on."""
-        return self._state
+        return self._device.power
 
     @property
     def color(self):
         """Return the color of the light."""
         return self._color
+
+    @property
+    def rgb_color(self):
+        return self._device.color
 
     # def update(self) -> None:
     #     """Fetch new state data for this light.

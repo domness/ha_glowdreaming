@@ -11,7 +11,7 @@ from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from .const import DOMAIN, Schema
 from .coordinator import BTCoordinator
-from .entity import GlowdreamingEntity
+from .entity import BTEntity
 
 # Initialize the logger
 _LOGGER = logging.getLogger(__name__)
@@ -27,7 +27,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry, async_add_e
     platform.async_register_entity_service("write_gatt", Schema.WRITE_GATT.value, "write_gatt")
     platform.async_register_entity_service("read_gatt", Schema.READ_GATT.value, "read_gatt")
 
-class GlowdreamingSensor(GlowdreamingEntity, SensorEntity):
+class GlowdreamingSensor(BTEntity, SensorEntity):
     """Representation of a Glowdreaming Sensor."""
 
     def __init__(self, coordinator: BTCoordinator) -> None:
@@ -36,7 +36,7 @@ class GlowdreamingSensor(GlowdreamingEntity, SensorEntity):
 
         self._name = "Sensor"
         self._attributes = {
-            "data": "UNKNOWN"
+            "mode_hex": "UNKNOWN"
         }
 
     def connection_state(self):
@@ -56,14 +56,19 @@ class GlowdreamingSensor(GlowdreamingEntity, SensorEntity):
     @property
     def state(self):
         """Return the state of the sensor."""
-        return self._device.state
+        return self._device._mode
 
     @property
     def extra_state_attributes(self):
         """Return the state attributes of the sensor."""
         return {
             **self._attributes,
-            "connected": self.connection_state()
+            "connected": self.connection_state(),
+            "volume": self._device.volume,
+            "color": self._device.color,
+            "brightness": self._device.brightness,
+            "mode": self._device._mode,
+            "mode_hex": self._device._mode_hex
         }
 
     async def set_mode(self, target_uuid, mode):
@@ -76,5 +81,5 @@ class GlowdreamingSensor(GlowdreamingEntity, SensorEntity):
 
     async def read_gatt(self, target_uuid):
         await self._device.read_gatt(target_uuid)
-        self._attributes['data'] = self._device._state_hex
+        self._attributes['mode_hex'] = self._device._mode_hex
         self.async_write_ha_state()
