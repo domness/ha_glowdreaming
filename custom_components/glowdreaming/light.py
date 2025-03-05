@@ -4,15 +4,15 @@ from __future__ import annotations
 import logging
 import math
 
-from homeassistant.components.light import (SUPPORT_BRIGHTNESS, SUPPORT_EFFECT, ATTR_BRIGHTNESS, ATTR_RGB_COLOR, ColorMode, PLATFORM_SCHEMA,
-                                            LightEntity)
+from homeassistant.components.light import (SUPPORT_BRIGHTNESS, SUPPORT_EFFECT, ATTR_BRIGHTNESS, ATTR_EFFECT, ColorMode,
+                                            LightEntity, LightEntityFeature)
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.util.color import value_to_brightness
 from homeassistant.util.percentage import percentage_to_ranged_value
 
-from .const import DOMAIN, Schema
+from .const import DOMAIN
 from .coordinator import BTCoordinator
 from .entity import BTEntity
 from .glowdreaming_api.const import GDEffect
@@ -38,6 +38,9 @@ class GlowdreamingLight(BTEntity, LightEntity):
         self._state = None
         self._brightness = None
         self._effect = None
+        self._attr_supported_features = LightEntityFeature.EFFECT
+        self._attr_supported_color_modes = ColorMode.BRIGHTNESS
+        self._attr_color_mode = ColorMode.BRIGHTNESS
 
     @property
     def name(self) -> str:
@@ -46,15 +49,14 @@ class GlowdreamingLight(BTEntity, LightEntity):
 
     @property
     def color_mode(self):
-        return None
+        return ColorMode.BRIGHTNESS
 
     @property
     def supported_color_modes(self):
-        return []
+        return [ColorMode.BRIGHTNESS]
 
     @property
     def supported_features(self):
-        """Flag supported features."""
         return SUPPORT_BRIGHTNESS | SUPPORT_EFFECT
 
     @property
@@ -86,6 +88,9 @@ class GlowdreamingLight(BTEntity, LightEntity):
     async def async_turn_on(self, **kwargs) -> None:
         """Instruct the light to turn on."""
         brightness = kwargs.get(ATTR_BRIGHTNESS, self.brightness)
+        effect = kwargs.get(ATTR_EFFECT, self.effect)
+        _LOGGER.debug(f"Effect: {effect}")
+
         value_in_range = math.ceil(percentage_to_ranged_value(BRIGHTNESS_SCALE, brightness))
         _LOGGER.debug(f"Value in range: {value_in_range}")
         await self._device.set_brightness(value_in_range)
