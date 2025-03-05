@@ -162,12 +162,11 @@ class GlowdreamingDevice:
         self._refresh_data(data)
         return data
 
-    # async def set_mode(self, target_uuid, mode):
-    #     await self.get_client()
-    #     # TODO: Split all of this out into separate commands once worked out the permutations
-    #     # gatt_from_mode(mode)
-    #     # await self.send_command(gatt_from_mode(mode))
-    #     _LOGGER.debug("Setting mode", target_uuid, mode)
+    async def set_mode(self, effect: GDEffect, brightness: GDBrightness, volume: GDVolume):
+        await self.get_client()
+        command = self.get_command_string(effect, brightness, volume)
+        _LOGGER.debug(f"Setting mode {command}")
+        # await self.send_command(gatt_from_mode(mode))
 
     def update_from_advertisement(self, advertisement):
         pass
@@ -186,7 +185,6 @@ class GlowdreamingDevice:
 
         response = [hex(x) for x in response_data]
 
-        # New World:
         power = bool(4 & int(response[9], 16)) # 4 is on
         volume = int(response[3], 16)
 
@@ -211,8 +209,8 @@ class GlowdreamingDevice:
         _LOGGER.debug(f"Effect state is {self._effect}")
         _LOGGER.debug(f"Brightness state is {self._brightness}")
 
-    def get_command_string(self, brightness, volume, effect):
-        _LOGGER.debug(f"Command string for: {brightness}, {volume}, {effect}")
+    def get_command_string(self, effect, brightness, volume):
+        _LOGGER.debug(f"Command string for: {effect}, {brightness}, {volume}")
 
         # 000000000000ffff0000 off
         # 0a0000000000ffff0000 red light 1
@@ -222,20 +220,20 @@ class GlowdreamingDevice:
         # 000000020000ffff0000 white noise 2
         # 000000010000ffff0000 white noise 1
 
-        if self._volume == 100:
+        if volume is GDVolume.HIGH:
             volume_level = "03"
-        elif self._volume == 40:
+        elif volume is GDVolume.MEDIUM:
             volume_level = "02"
-        elif self._volume == 10:
+        elif volume is GDVolume.LOW:
             volume_level = "01"
         else:
             volume_level = "00"
 
-        if brightness == 1:
+        if brightness is GDBrightness.LOW:
             brightness_hex = "0a"
-        elif brightness == 2:
+        elif brightness is GDBrightness.MEDIUM:
             brightness_hex = "28"
-        elif brightness == 3:
+        elif brightness is GDBrightness.HIGH:
             brightness_hex = "64"
         else:
             brightness_hex = "00"

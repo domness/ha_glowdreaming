@@ -42,6 +42,7 @@ class GlowdreamingLight(BTEntity, LightEntity):
         self._effect = None
         # self._attr_supported_features = LightEntityFeature.EFFECT
         # self._attr_supported_color_modes = {ColorMode.BRIGHTNESS}
+        self._attr_supported_color_modes = set()
         # self._attr_color_mode = ColorMode.BRIGHTNESS
 
     @property

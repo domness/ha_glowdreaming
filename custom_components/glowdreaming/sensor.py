@@ -12,6 +12,7 @@ from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from .const import DOMAIN, Schema
 from .coordinator import BTCoordinator
 from .entity import BTEntity
+from .glowdreaming_api.const import *
 
 # Initialize the logger
 _LOGGER = logging.getLogger(__name__)
@@ -72,8 +73,14 @@ class GlowdreamingSensor(BTEntity, SensorEntity):
         }
 
     async def set_mode(self, light_effect, brightness, volume):
-        _LOGGER.debug("Setting mode to %s, brightness to %s, and volume to %s", light_effect, brightness, volume)
-        # await self._device.set_mode(mode)
+        _LOGGER.debug("Setting effect to %s, brightness to %s, and volume to %s", light_effect, brightness, volume)
+
+        gd_effect = GDEffect(light_effect)
+        gd_brightness = GDBrightness(brightness)
+        gd_volume = GDVolume(volume)
+
+        await self._device.set_mode(gd_effect, gd_brightness, gd_volume)
+
         self.async_write_ha_state()
 
     async def write_gatt(self, target_uuid, data):
