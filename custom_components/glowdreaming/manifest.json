@@ -1,6 +1,6 @@
 {
   "domain": "glowdreaming",
-  "name": "Glowdreaming",
+  "name": "Glow Dreaming",
   "codeowners": ["@domness"],
   "config_flow": true,
   "dependencies": ["bluetooth_adapters"],
