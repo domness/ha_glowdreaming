@@ -28,6 +28,8 @@ def get_mode_from_string(value: str):
         return "Sound: Low, Red: Low"
     elif value == "640000000001000000040044":
         return "Sound: Off, Red: High"
+    elif value == "640000030001000000040044":
+        return "Sound: High, Red: High"
     elif value == "640000010001000000040044":
         return "Sound: Low, Red: High"
     elif value == "000a00000001000000040044":
