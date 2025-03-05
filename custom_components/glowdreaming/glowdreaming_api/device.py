@@ -13,31 +13,31 @@ _LOGGER = logging.getLogger(__name__)
 
 def get_mode_from_string(value: str):
     if value == "000000000001000000000044":
-        return "Off"
+        return "Off - All"
     elif value == "000000010001000000040044":
-        return "Sound: Low, Red: Off"
+        return "Sound: Low"
     elif value == "000000020001000000040044":
-        return "Sound: Medium, Red: Off"
+        return "Sound: Medium"
     elif value == "000000030001000000040044":
-        return "Sound: High, Red: Off"
+        return "Sound: High"
     elif value == "0a0000000001000000040044":
-        return "Sound: Off, Red: Low"
+        return "Sound: Off, Sleep: Low"
     elif value == "280000000001000000040044":
-        return "Sound: Off, Red: Medium"
+        return "Sound: Off, Sleep: Medium"
     elif value == "0a0000010001000000040044":
-        return "Sound: Low, Red: Low"
+        return "Sound: Low, Sleep: Low"
     elif value == "640000000001000000040044":
-        return "Sound: Off, Red: High"
+        return "Sound: Off, Sleep: High"
     elif value == "640000030001000000040044":
-        return "Sound: High, Red: High"
+        return "Sound: High, Sleep: High"
     elif value == "640000010001000000040044":
-        return "Sound: Low, Red: High"
+        return "Sound: Low, Sleep: High"
     elif value == "000a00000001000000040044":
-        return "Sound: Off, Green: Low"
+        return "Sound: Off, Awake: Low"
     elif value == "002800000001000000040044":
-        return "Sound: Off, Green: Medium"
+        return "Sound: Off, Awake: Medium"
     elif value == "006400000001000000040044":
-        return "Sound: Off, Green: High"
+        return "Sound: Off, Awake: High"
     else:
         return "Unknown"
 
