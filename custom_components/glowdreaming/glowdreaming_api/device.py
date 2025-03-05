@@ -39,17 +39,17 @@ def get_mode_from_string(value: str):
     else:
         return "Unknown"
 
-def gatt_from_mode(mode: str):
-    if mode == "off":
-        return GDModeCommand.OFF
-    elif mode == "noise_quiet":
-        return GDModeCommand.NOISE_QUIET
-    elif mode == "noise_medium":
-        return GDModeCommand.NOISE_MEDIUM
-    elif mode == "noise_loud":
-        return GDModeCommand.NOISE_LOUD
-    else:
-        return ""
+# def gatt_from_mode(mode: str):
+#     if mode == "off":
+#         return GDModeCommand.OFF
+#     elif mode == "noise_quiet":
+#         return GDModeCommand.NOISE_QUIET
+#     elif mode == "noise_medium":
+#         return GDModeCommand.NOISE_MEDIUM
+#     elif mode == "noise_loud":
+#         return GDModeCommand.NOISE_LOUD
+#     else:
+#         return ""
 
 class GlowdreamingDevice:
     """Generic BT Device Class"""
@@ -65,7 +65,7 @@ class GlowdreamingDevice:
         self._power = None
         self._volume = None
         self._brightness = None
-        self._color = None
+        self._effect = None
 
     async def update(self):
         _LOGGER.debug("Update called")
@@ -104,8 +104,8 @@ class GlowdreamingDevice:
         return self._brightness
 
     @property
-    def color(self):
-        return self._color
+    def effect(self):
+        return self._effect
 
     async def get_client(self):
         def disconnected_callback(client):
@@ -190,18 +190,65 @@ class GlowdreamingDevice:
 
         red, green, blue = [int(x, 16) for x in response[0:3]]
         brightness = max(red, green, blue)
-        red_color = 255 if red > 0 else 0
-        green_color = 255 if green > 0 else 0
-        blue_color = 255 if blue > 0 else 0
+        if red > 0:
+            effect = GDEffect.SLEEP
+        elif green > 0:
+            effect = GDEffect.AWAKE
+        else:
+            effect = GDEffect.NONE
 
         self._power = power
         self._volume = volume
-        self._sound = GDSound.white_noise
-        self._color = (red_color, green_color, blue_color)
-        self._brightness = round(255 / 100 * brightness)
+        self._sound = GDSound.WHITE_NOISE
+        self._effect = effect
+        self._brightness = brightness
 
         _LOGGER.debug(f"Power state is {self._power}")
         _LOGGER.debug(f"Volume state is {self._volume}")
         _LOGGER.debug(f"Sound state is {self._sound}")
-        _LOGGER.debug(f"Color state is {self._color}")
+        _LOGGER.debug(f"Effect state is {self._effect}")
         _LOGGER.debug(f"Brightness state is {self._brightness}")
+
+    def get_command_string(self, brightness, volume, effect):
+        # 000000000000ffff0000 off
+        # 0a0000000000ffff0000 red light 1
+        # 280000000000ffff0000 red light 2
+        # 640000000000ffff0000 red light 3
+        # 000000030000ffff0000 white noise 3
+        # 000000020000ffff0000 white noise 2
+        # 000000010000ffff0000 white noise 1
+
+        if self._volume == 100:
+            volume_level = "03"
+        elif self._volume == 40:
+            volume_level = "02"
+        elif self._volume == 10:
+            volume_level = "01"
+        else:
+            volume_level = "00"
+
+        return "000000{volume_level}0000ffff0000".format(volume_level=volume_level)
+
+    async def set_volume(self, volume):
+        _LOGGER.debug("Setting volume to {volume}")
+        volume_levels = [0, 10, 40, 100]
+        closest_volume = min(volume_levels, key=lambda x: abs(x - volume))
+        # self._volume = closest_volume
+        command = self.get_command_string(self._brightness, closest_volume, self._effect)
+        _LOGGER.debug("Volume Command: {command}")
+        # await self.send_command(command)
+
+    async def set_brightness(self, brightness):
+        _LOGGER.debug("Setting brightness to {brightness}")
+        # self._brightness = brightness
+        # command = "SC{:02x}{:02x}{:02x}{:02x}".format(color[0], color[1], color[2], brightness)
+        # await self.send_command(command)
+        # _LOGGER.debug("Color:", color)
+        _LOGGER.debug("Brightness: {brightness}")
+        command = ""
+        _LOGGER.debug("Brightness Command: {command}")
+
+    async def set_effect(self, effect):
+        _LOGGER.debug("Setting effect to {effect}")
+        command = ""
+        _LOGGER.debug("Effect Command: {command}")

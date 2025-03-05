@@ -64,7 +64,7 @@ class GlowdreamingSensor(BTEntity, SensorEntity):
             **self._attributes,
             "connected": self.connection_state(),
             "volume": self._device.volume,
-            "color": self._device.color,
+            "effect": self._device.effect,
             "brightness": self._device.brightness,
             "mode": self._device._mode,
             "mode_hex": self._device._mode_hex

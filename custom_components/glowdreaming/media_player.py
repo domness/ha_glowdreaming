@@ -67,3 +67,7 @@ class GlowdreamingMediaPlayer(BTEntity, MediaPlayerEntity):
     @property
     def volume_level(self) -> float | None:
         return float(self._device.volume / 3)
+
+    async def async_set_volume_level(self, volume):
+        await self._device.set_volume(int(255 * volume))
+        self.async_write_ha_state()
