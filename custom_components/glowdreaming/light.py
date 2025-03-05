@@ -20,7 +20,7 @@ from .glowdreaming_api.const import GDEffect
 # Initialize the logger
 _LOGGER = logging.getLogger(__name__)
 PARALLEL_UPDATES = 0
-BRIGHTNESS_SCALE = (1, 3)
+BRIGHTNESS_SCALE = (1, 100)
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry, async_add_entities: AddEntitiesCallback) -> None:
     """Set up Glowdreaming device based on a config entry."""
