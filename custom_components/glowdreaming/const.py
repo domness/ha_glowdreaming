@@ -11,6 +11,13 @@ DEVICE_STARTUP_TIMEOUT_SECONDS = 30
 class Schema(Enum):
     """General used service schema definition"""
 
+    SET_MODE = make_entity_service_schema(
+        {
+            vol.Required("light_effect"): cv.string,
+            vol.Required("brightness"): cv.string,
+            vol.Required("volume"): cv.string
+        }
+    )
     WRITE_GATT = make_entity_service_schema(
         {
             vol.Required("target_uuid"): cv.string,

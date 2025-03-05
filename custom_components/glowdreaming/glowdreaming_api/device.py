@@ -169,13 +169,13 @@ class GlowdreamingDevice:
     #     # await self.send_command(gatt_from_mode(mode))
     #     _LOGGER.debug("Setting mode", target_uuid, mode)
 
+    def update_from_advertisement(self, advertisement):
+        pass
+
     async def send_command(self, data) -> None:
         await self.write_gatt(CHAR_CHARACTERISTIC, data)
         await asyncio.sleep(0.75)
         await self.update()
-
-    def update_from_advertisement(self, advertisement):
-        pass
 
     def _refresh_data(self, response_data) -> None:
         _LOGGER.debug(f"Glowdreaming Hex {response_data}")
@@ -212,6 +212,8 @@ class GlowdreamingDevice:
         _LOGGER.debug(f"Brightness state is {self._brightness}")
 
     def get_command_string(self, brightness, volume, effect):
+        _LOGGER.debug(f"Command string for: {brightness}, {volume}, {effect}")
+
         # 000000000000ffff0000 off
         # 0a0000000000ffff0000 red light 1
         # 280000000000ffff0000 red light 2
@@ -229,28 +231,45 @@ class GlowdreamingDevice:
         else:
             volume_level = "00"
 
-        return "000000{volume_level}0000ffff0000".format(volume_level=volume_level)
+        if brightness == 1:
+            brightness_hex = "0a"
+        elif brightness == 2:
+            brightness_hex = "28"
+        elif brightness == 3:
+            brightness_hex = "64"
+        else:
+            brightness_hex = "00"
 
-    async def set_volume(self, volume):
-        _LOGGER.debug(f"Setting volume to {volume}")
-        volume_levels = [0, 10, 40, 100]
-        closest_volume = min(volume_levels, key=lambda x: abs(x - volume))
-        # self._volume = closest_volume
-        command = self.get_command_string(self._brightness, closest_volume, self._effect)
-        _LOGGER.debug(f"Volume Command: {command}")
-        # await self.send_command(command)
+        if effect is GDEffect.AWAKE:
+            red_value = "00"
+            green_value = brightness_hex # change
+        elif effect is GDEffect.SLEEP:
+            red_value = brightness_hex # change
+            green_value = "00"
+        else:
+            red_value = "00"
+            green_value = "00"
 
-    async def set_brightness(self, brightness):
-        _LOGGER.debug(f"Setting brightness to {brightness}")
-        # self._brightness = brightness
-        # command = "SC{:02x}{:02x}{:02x}{:02x}".format(color[0], color[1], color[2], brightness)
-        # await self.send_command(command)
-        # _LOGGER.debug(f"Color:", color)
-        _LOGGER.debug(f"Brightness: {brightness}")
-        command = ""
-        _LOGGER.debug(f"Brightness Command: {command}")
+        return "{red_value}{green_value}00{volume_level}0000ffff0000".format(volume_level=volume_level, red_value=red_value, green_value=green_value)
 
-    async def set_effect(self, effect):
-        _LOGGER.debug(f"Setting effect to {effect}")
-        command = ""
-        _LOGGER.debug(f"Effect Command: {command}")
+    # async def set_volume(self, volume):
+    #     _LOGGER.debug(f"Setting volume to {volume}")
+    #     volume_levels = [0, 10, 40, 100]
+    #     closest_volume = min(volume_levels, key=lambda x: abs(x - volume))
+    #     _LOGGER.debug(f"Closest volume: {closest_volume}")
+    #     # self._volume = closest_volume
+    #     command = self.get_command_string(self._brightness, closest_volume, self._effect)
+    #     _LOGGER.debug(f"Volume Command: {command}")
+    #     await self.send_command(command)
+
+    # async def set_brightness(self, brightness, effect):
+    #     _LOGGER.debug(f"Setting brightness/effect to {brightness} {effect}")
+    #     self._brightness = brightness
+    #     self._effect = effect
+    #     # command = "SC{:02x}{:02x}{:02x}{:02x}".format(color[0], color[1], color[2], brightness)
+    #     # _LOGGER.debug(f"Color:", color)
+    #     # brightness_levels = [1, 2, 3]
+    #     # _LOGGER.debug(f"Brightness: {brightness}")
+    #     command = self.get_command_string(brightness, self._volume, effect)
+    #     _LOGGER.debug(f"Brightness/Effect Command: {command}")
+    #     await self.send_command(command)

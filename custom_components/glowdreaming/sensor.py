@@ -25,6 +25,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry, async_add_e
     platform = entity_platform.async_get_current_platform()
     platform.async_register_entity_service("write_gatt", Schema.WRITE_GATT.value, "write_gatt")
     platform.async_register_entity_service("read_gatt", Schema.READ_GATT.value, "read_gatt")
+    platform.async_register_entity_service("set_mode", Schema.SET_MODE.value, "set_mode")
 
 class GlowdreamingSensor(BTEntity, SensorEntity):
     """Representation of a Glowdreaming Sensor."""
@@ -70,9 +71,10 @@ class GlowdreamingSensor(BTEntity, SensorEntity):
             "mode_hex": self._device._mode_hex
         }
 
-    # async def set_mode(self, target_uuid, mode):
-    #     await self._device.set_mode(target_uuid, mode)
-    #     self.async_write_ha_state()
+    async def set_mode(self, light_effect, brightness, volume):
+        _LOGGER.debug("Setting mode to %s, brightness to %s, and volume to %s", light_effect, brightness, volume)
+        # await self._device.set_mode(mode)
+        self.async_write_ha_state()
 
     async def write_gatt(self, target_uuid, data):
         await self._device.write_gatt(target_uuid, data)

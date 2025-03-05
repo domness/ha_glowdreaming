@@ -1,21 +1,43 @@
-# set_mode:
-#   name: Set Mode
-#   description: Set Mode to Awake/Sleep/None
-#   target:
-#     entity:
-#       domain: sensor
-#       integration: glowdreaming
-#   fields:
-#     mode:
-#       name: Mode
-#       description: Mode
-#       required: true
-#       selector:
-#         select:
-#           options:
-#             - Awake
-#             - Sleep
-#             - None
+set_mode:
+  name: Set Mode
+  description: Set light effect, brightness and volume
+  target:
+    entity:
+      domain: sensor
+      integration: glowdreaming
+  fields:
+    light_effect:
+      name: Light Effect
+      description: Light Effect
+      required: true
+      selector:
+        select:
+          options:
+            - Awake
+            - Sleep
+            - None
+    brightness:
+      name: Brightness
+      description: Brightness
+      required: true
+      selector:
+        select:
+          options:
+            - None
+            - Low
+            - Medium
+            - High
+    volume:
+      name: Volume
+      description: Volume
+      required: true
+      selector:
+        select:
+          options:
+            - None
+            - Low
+            - Medium
+            - High
 write_gatt:
   name: Write Data into Target UUID
   description: Write Data into Target UUID

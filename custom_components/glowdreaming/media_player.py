@@ -35,16 +35,16 @@ class GlowdreamingMediaPlayer(BTEntity, MediaPlayerEntity):
     def name(self):
         return self._name
 
-    @property
-    def supported_features(self) -> MediaPlayerEntityFeature:
-        return (
-            MediaPlayerEntityFeature.PLAY
-            | MediaPlayerEntityFeature.STOP
-            | MediaPlayerEntityFeature.VOLUME_SET
-            | MediaPlayerEntityFeature.SELECT_SOURCE
-            | MediaPlayerEntityFeature.TURN_ON
-            | MediaPlayerEntityFeature.TURN_OFF
-        )
+    # @property
+    # def supported_features(self) -> MediaPlayerEntityFeature:
+    #     return (
+    #         MediaPlayerEntityFeature.PLAY
+    #         | MediaPlayerEntityFeature.STOP
+    #         | MediaPlayerEntityFeature.VOLUME_SET
+    #         | MediaPlayerEntityFeature.SELECT_SOURCE
+    #         | MediaPlayerEntityFeature.TURN_ON
+    #         | MediaPlayerEntityFeature.TURN_OFF
+    #     )
 
     @property
     def device_class(self) -> MediaPlayerDeviceClass | None:
@@ -68,6 +68,6 @@ class GlowdreamingMediaPlayer(BTEntity, MediaPlayerEntity):
     def volume_level(self) -> float | None:
         return float(self._device.volume / 3)
 
-    async def async_set_volume_level(self, volume):
-        await self._device.set_volume(int(255 * volume))
-        self.async_write_ha_state()
+    # async def async_set_volume_level(self, volume):
+    #     await self._device.set_volume(int(255 * volume))
+    #     self.async_write_ha_state()
