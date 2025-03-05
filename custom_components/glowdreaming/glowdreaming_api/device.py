@@ -155,7 +155,7 @@ class GlowdreamingDevice:
         uuid_str = "{" + target_uuid + "}"
         uuid = UUID(uuid_str)
         data = await self._client.read_gatt_char(uuid)
-        _LOGGER.debug("Reading Gatt", data)
+        _LOGGER.debug(f"Reading Gatt {data}")
         print(data)
         self._refresh_data(data)
         return data
@@ -230,25 +230,25 @@ class GlowdreamingDevice:
         return "000000{volume_level}0000ffff0000".format(volume_level=volume_level)
 
     async def set_volume(self, volume):
-        _LOGGER.debug("Setting volume to {volume}")
+        _LOGGER.debug(f"Setting volume to {volume}")
         volume_levels = [0, 10, 40, 100]
         closest_volume = min(volume_levels, key=lambda x: abs(x - volume))
         # self._volume = closest_volume
         command = self.get_command_string(self._brightness, closest_volume, self._effect)
-        _LOGGER.debug("Volume Command: {command}")
+        _LOGGER.debug(f"Volume Command: {command}")
         # await self.send_command(command)
 
     async def set_brightness(self, brightness):
-        _LOGGER.debug("Setting brightness to {brightness}")
+        _LOGGER.debug(f"Setting brightness to {brightness}")
         # self._brightness = brightness
         # command = "SC{:02x}{:02x}{:02x}{:02x}".format(color[0], color[1], color[2], brightness)
         # await self.send_command(command)
-        # _LOGGER.debug("Color:", color)
-        _LOGGER.debug("Brightness: {brightness}")
+        # _LOGGER.debug(f"Color:", color)
+        _LOGGER.debug(f"Brightness: {brightness}")
         command = ""
-        _LOGGER.debug("Brightness Command: {command}")
+        _LOGGER.debug(f"Brightness Command: {command}")
 
     async def set_effect(self, effect):
-        _LOGGER.debug("Setting effect to {effect}")
+        _LOGGER.debug(f"Setting effect to {effect}")
         command = ""
-        _LOGGER.debug("Effect Command: {command}")
+        _LOGGER.debug(f"Effect Command: {command}")
