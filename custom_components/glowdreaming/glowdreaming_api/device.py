@@ -11,35 +11,35 @@ from .const import *
 
 _LOGGER = logging.getLogger(__name__)
 
-def get_mode_from_string(value: str):
-    if value == "000000000001000000000044":
-        return "Off - All"
-    elif value == "000000010001000000040044":
-        return "Sound: Low"
-    elif value == "000000020001000000040044":
-        return "Sound: Medium"
-    elif value == "000000030001000000040044":
-        return "Sound: High"
-    elif value == "0a0000000001000000040044":
-        return "Sound: Off, Sleep: Low"
-    elif value == "280000000001000000040044":
-        return "Sound: Off, Sleep: Medium"
-    elif value == "0a0000010001000000040044":
-        return "Sound: Low, Sleep: Low"
-    elif value == "640000000001000000040044":
-        return "Sound: Off, Sleep: High"
-    elif value == "640000030001000000040044":
-        return "Sound: High, Sleep: High"
-    elif value == "640000010001000000040044":
-        return "Sound: Low, Sleep: High"
-    elif value == "000a00000001000000040044":
-        return "Sound: Off, Awake: Low"
-    elif value == "002800000001000000040044":
-        return "Sound: Off, Awake: Medium"
-    elif value == "006400000001000000040044":
-        return "Sound: Off, Awake: High"
-    else:
-        return "Unknown"
+# def get_mode_from_string(value: str):
+#     if value == "000000000001000000000044":
+#         return "Off - All"
+#     elif value == "000000010001000000040044":
+#         return "Sound: Low"
+#     elif value == "000000020001000000040044":
+#         return "Sound: Medium"
+#     elif value == "000000030001000000040044":
+#         return "Sound: High"
+#     elif value == "0a0000000001000000040044":
+#         return "Sound: Off, Sleep: Low"
+#     elif value == "280000000001000000040044":
+#         return "Sound: Off, Sleep: Medium"
+#     elif value == "0a0000010001000000040044":
+#         return "Sound: Low, Sleep: Low"
+#     elif value == "640000000001000000040044":
+#         return "Sound: Off, Sleep: High"
+#     elif value == "640000030001000000040044":
+#         return "Sound: High, Sleep: High"
+#     elif value == "640000010001000000040044":
+#         return "Sound: Low, Sleep: High"
+#     elif value == "000a00000001000000040044":
+#         return "Sound: Off, Awake: Low"
+#     elif value == "002800000001000000040044":
+#         return "Sound: Off, Awake: Medium"
+#     elif value == "006400000001000000040044":
+#         return "Sound: Off, Awake: High"
+#     else:
+#         return "Unknown"
 
 class GlowdreamingDevice:
     """Generic BT Device Class"""
@@ -169,7 +169,6 @@ class GlowdreamingDevice:
         hex_str = response_data.hex()
 
         self._mode_hex = hex_str
-        self._mode = get_mode_from_string(hex_str)
 
         response = [hex(x) for x in response_data]
 
@@ -190,6 +189,8 @@ class GlowdreamingDevice:
         self._sound = GDSound.WHITE_NOISE
         self._effect = effect
         self._brightness = brightness
+
+        self._mode = f"Power: {power}, Volume: {volume}, Brightness: {brightness}, Effect: {effect}"
 
         _LOGGER.debug(f"Power state is {self._power}")
         _LOGGER.debug(f"Volume state is {self._volume}")
