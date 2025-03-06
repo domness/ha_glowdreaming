@@ -3,8 +3,7 @@ from __future__ import annotations
 
 import logging
 
-from homeassistant.components.light import (ATTR_BRIGHTNESS, ATTR_EFFECT, ColorMode,
-                                            LightEntity, LightEntityFeature)
+from homeassistant.components.light import (ATTR_BRIGHTNESS, ATTR_EFFECT, LightEntity)
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
@@ -16,13 +15,6 @@ from .glowdreaming_api.const import GDEffect
 
 _LOGGER = logging.getLogger(__name__)
 PARALLEL_UPDATES = 0
-
-# def map_value_to_scale(value):
-#     # Ensure the value is within the expected range (1-255)
-#     if 0 <= value <= 255:
-#         return min(3, value // 64)  # Use integer division and limit to 3 (the max scale)
-#     else:
-#         raise ValueError("Value must be between 0 and 255")
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry, async_add_entities: AddEntitiesCallback) -> None:
     """Set up Glowdreaming device based on a config entry."""
@@ -40,9 +32,9 @@ class GlowdreamingLight(BTEntity, LightEntity):
         self._state = None
         self._brightness = None
         self._effect = None
+        self._attr_supported_color_modes = set()
         # self._attr_supported_features = LightEntityFeature.EFFECT
         # self._attr_supported_color_modes = {ColorMode.BRIGHTNESS}
-        self._attr_supported_color_modes = set()
         # self._attr_color_mode = ColorMode.BRIGHTNESS
 
     @property
@@ -77,15 +69,6 @@ class GlowdreamingLight(BTEntity, LightEntity):
     # @property
     # def effect_list(self):
     #     return [e.value for e in GDEffect]
-
-    # def update(self) -> None:
-    #     """Fetch new state data for this light.
-
-    #     This is the only method that should fetch new data for Home Assistant.
-    #     """
-    #     self._light.update()
-    #     self._state = self._light.is_on()
-    #     self._brightness = self._light.brightness
 
     # async def async_turn_on(self, **kwargs) -> None:
     #     """Instruct the light to turn on."""

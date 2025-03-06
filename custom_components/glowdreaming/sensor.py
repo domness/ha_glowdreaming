@@ -14,7 +14,6 @@ from .coordinator import BTCoordinator
 from .entity import BTEntity
 from .glowdreaming_api.const import *
 
-# Initialize the logger
 _LOGGER = logging.getLogger(__name__)
 PARALLEL_UPDATES = 0
 

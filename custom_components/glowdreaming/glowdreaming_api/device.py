@@ -41,18 +41,6 @@ def get_mode_from_string(value: str):
     else:
         return "Unknown"
 
-# def gatt_from_mode(mode: str):
-#     if mode == "off":
-#         return GDModeCommand.OFF
-#     elif mode == "noise_quiet":
-#         return GDModeCommand.NOISE_QUIET
-#     elif mode == "noise_medium":
-#         return GDModeCommand.NOISE_MEDIUM
-#     elif mode == "noise_loud":
-#         return GDModeCommand.NOISE_LOUD
-#     else:
-#         return ""
-
 class GlowdreamingDevice:
     """Generic BT Device Class"""
     def __init__(self, ble_device):
@@ -166,7 +154,7 @@ class GlowdreamingDevice:
         await self.get_client()
         command = self.get_command_string(effect, brightness, volume)
         _LOGGER.debug(f"Setting mode {command}")
-        # await self.send_command(gatt_from_mode(mode))
+        await self.send_command(mode)
 
     def update_from_advertisement(self, advertisement):
         pass
@@ -249,25 +237,3 @@ class GlowdreamingDevice:
             green_value = "00"
 
         return "{red_value}{green_value}00{volume_level}0000ffff0000".format(volume_level=volume_level, red_value=red_value, green_value=green_value)
-
-    # async def set_volume(self, volume):
-    #     _LOGGER.debug(f"Setting volume to {volume}")
-    #     volume_levels = [0, 10, 40, 100]
-    #     closest_volume = min(volume_levels, key=lambda x: abs(x - volume))
-    #     _LOGGER.debug(f"Closest volume: {closest_volume}")
-    #     # self._volume = closest_volume
-    #     command = self.get_command_string(self._brightness, closest_volume, self._effect)
-    #     _LOGGER.debug(f"Volume Command: {command}")
-    #     await self.send_command(command)
-
-    # async def set_brightness(self, brightness, effect):
-    #     _LOGGER.debug(f"Setting brightness/effect to {brightness} {effect}")
-    #     self._brightness = brightness
-    #     self._effect = effect
-    #     # command = "SC{:02x}{:02x}{:02x}{:02x}".format(color[0], color[1], color[2], brightness)
-    #     # _LOGGER.debug(f"Color:", color)
-    #     # brightness_levels = [1, 2, 3]
-    #     # _LOGGER.debug(f"Brightness: {brightness}")
-    #     command = self.get_command_string(brightness, self._volume, effect)
-    #     _LOGGER.debug(f"Brightness/Effect Command: {command}")
-    #     await self.send_command(command)
