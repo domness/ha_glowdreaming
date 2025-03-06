@@ -4,9 +4,9 @@
   "codeowners": ["@domness"],
   "config_flow": true,
   "dependencies": ["bluetooth_adapters"],
-  "iot_class": "local_push",
-  "integration_type": "device",
-  "version": "1.0.0",
   "documentation": "https://github.com/domness/ha_glowdreaming",
-  "issue_tracker": "https://github.com/domness/ha_glowdreaming/issues"
+  "integration_type": "device",
+  "iot_class": "local_push",
+  "issue_tracker": "https://github.com/domness/ha_glowdreaming/issues",
+  "version": "1.0.0"
 }
