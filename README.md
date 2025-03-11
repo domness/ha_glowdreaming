@@ -9,6 +9,11 @@
 - Fetch the current state of your Glow Dreaming device (i.e. White Noise - Loud Volume)
 - Set the state of your Glow Dreaming device
 
+## Screenshots
+
+<img width="989" alt="Screenshot 2025-03-11 at 20 58 56" src="https://github.com/user-attachments/assets/90de730a-f100-4d02-9ad7-e5b6e5c36958" />
+<img width="1035" alt="Screenshot 2025-03-11 at 20 59 32" src="https://github.com/user-attachments/assets/fccd1e6b-6dee-47a4-abed-06a287a2bb8b" />
+
 ## What you need
 
 - A Glow Dreaming device with Bluetooth (App) support
