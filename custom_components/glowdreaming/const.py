@@ -18,6 +18,21 @@ class Schema(Enum):
             vol.Required("volume"): cv.string
         }
     )
+    SET_SLEEP_BRIGHTNESS = make_entity_service_schema(
+        {
+            vol.Required("brightness"): cv.string
+        }
+    )
+    SET_AWAKE_BRIGHTNESS = make_entity_service_schema(
+        {
+            vol.Required("brightness"): cv.string
+        }
+    )
+    SET_VOLUME = make_entity_service_schema(
+        {
+            vol.Required("volume"): cv.string
+        }
+    )
     WRITE_GATT = make_entity_service_schema(
         {
             vol.Required("target_uuid"): cv.string,

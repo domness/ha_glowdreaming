@@ -38,6 +38,63 @@ set_mode:
             - Low
             - Medium
             - High
+set_sleep_brightness:
+  name: Set Sleep Brightness
+  description: Set brightness
+  target:
+    entity:
+      domain: sensor
+      integration: glowdreaming
+  fields:
+    brightness:
+      name: Brightness
+      description: Brightness
+      required: true
+      selector:
+        select:
+          options:
+            - None
+            - Low
+            - Medium
+            - High
+set_awake_brightness:
+  name: Set Awake Brightness
+  description: Set brightness
+  target:
+    entity:
+      domain: sensor
+      integration: glowdreaming
+  fields:
+    brightness:
+      name: Brightness
+      description: Brightness
+      required: true
+      selector:
+        select:
+          options:
+            - None
+            - Low
+            - Medium
+            - High
+set_volume:
+  name: Set Volume
+  description: Set volume
+  target:
+    entity:
+      domain: sensor
+      integration: glowdreaming
+  fields:
+    volume:
+      name: Volume
+      description: Volume
+      required: true
+      selector:
+        select:
+          options:
+            - None
+            - Low
+            - Medium
+            - High
 write_gatt:
   name: Write Data into Target UUID
   description: Write Data into Target UUID

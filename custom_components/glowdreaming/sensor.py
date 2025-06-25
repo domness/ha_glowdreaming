@@ -26,6 +26,9 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry, async_add_e
     platform.async_register_entity_service("write_gatt", Schema.WRITE_GATT.value, "write_gatt")
     platform.async_register_entity_service("read_gatt", Schema.READ_GATT.value, "read_gatt")
     platform.async_register_entity_service("set_mode", Schema.SET_MODE.value, "set_mode")
+    platform.async_register_entity_service("set_sleep_brightness", Schema.SET_SLEEP_BRIGHTNESS.value, "set_sleep_brightness")
+    platform.async_register_entity_service("set_awake_brightness", Schema.SET_AWAKE_BRIGHTNESS.value, "set_awake_brightness")
+    platform.async_register_entity_service("set_volume", Schema.SET_VOLUME.value, "set_volume")
 
 class GlowdreamingSensor(BTEntity, SensorEntity):
     """Representation of a Glowdreaming Sensor."""
@@ -76,6 +79,39 @@ class GlowdreamingSensor(BTEntity, SensorEntity):
 
         gd_effect = GDEffect(light_effect)
         gd_brightness = GDBrightness(brightness)
+        gd_volume = GDVolume(volume)
+
+        await self._device.set_mode(gd_effect, gd_brightness, gd_volume)
+
+        self.async_write_ha_state()
+
+    async def set_awake_brightness(self, brightness):
+        _LOGGER.debug("Setting awake brightness to %s", brightness)
+
+        gd_effect = GDEffect.AWAKE
+        gd_brightness = GDBrightness(brightness)
+        gd_volume = self._device.volume_level
+
+        await self._device.set_mode(gd_effect, gd_brightness, gd_volume)
+
+        self.async_write_ha_state()
+
+    async def set_sleep_brightness(self, brightness):
+        _LOGGER.debug("Setting sleep brightness to %s", brightness)
+
+        gd_effect = GDEffect.SLEEP
+        gd_brightness = GDBrightness(brightness)
+        gd_volume = self._device.volume_level
+
+        await self._device.set_mode(gd_effect, gd_brightness, gd_volume)
+
+        self.async_write_ha_state()
+
+    async def set_volume(self, volume):
+        _LOGGER.debug("Setting volume to %s", volume)
+
+        gd_effect = self._device.effect
+        gd_brightness = self._device.brightness_level
         gd_volume = GDVolume(volume)
 
         await self._device.set_mode(gd_effect, gd_brightness, gd_volume)

@@ -90,8 +90,34 @@ class GlowdreamingDevice:
         return self._volume
 
     @property
+    def volume_level(self) -> GDVolume:
+        if self._volume is None:
+            return GDVolume.NONE
+        elif self._volume == 1:
+            return GDVolume.LOW
+        elif self._volume == 2:
+            return GDVolume.MEDIUM
+        elif self._volume == 3:
+            return GDVolume.HIGH
+        else:
+            return GDVolume.NONE
+
+    @property
     def brightness(self):
         return self._brightness
+
+    @property
+    def brightness_level(self) -> GDBrightness:
+        if self._brightness is None:
+            return GDBrightness.NONE
+        elif self._brightness == 10:
+            return GDBrightness.LOW
+        elif self._brightness == 40:
+            return GDBrightness.MEDIUM
+        elif self._brightness == 100:
+            return GDBrightness.HIGH
+        else:
+            return GDBrightness.NONE
 
     @property
     def effect(self):
