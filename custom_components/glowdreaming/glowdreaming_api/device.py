@@ -154,7 +154,7 @@ class GlowdreamingDevice:
         await self.get_client()
         command = self.get_command_string(effect, brightness, volume)
         _LOGGER.debug(f"Setting mode {command}")
-        await self.send_command(mode)
+        await self.send_command(command)
 
     def update_from_advertisement(self, advertisement):
         pass
