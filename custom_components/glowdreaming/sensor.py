@@ -70,18 +70,22 @@ class GlowdreamingSensor(BTEntity, SensorEntity):
             "volume": self._device.volume,
             "effect": self._device.effect,
             "brightness": self._device.brightness,
+            "humidifier": self._device.humidifier,
+            "humidifier_timer": self._device.humidifier_timer,
+            "device_lock": self._device.device_lock,
             "mode": self._device._mode,
             "mode_hex": self._device._mode_hex
         }
 
-    async def set_mode(self, light_effect, brightness, volume):
-        _LOGGER.debug("Setting effect to %s, brightness to %s, and volume to %s", light_effect, brightness, volume)
+    async def set_mode(self, light_effect, brightness, volume, humidifier):
+        _LOGGER.debug("Setting effect to %s, brightness to %s, volume to %s, and humidifier to %s", light_effect, brightness, volume, humidifier)
 
         gd_effect = GDEffect(light_effect)
         gd_brightness = GDBrightness(brightness)
         gd_volume = GDVolume(volume)
+        gd_humidifier = GDHumidifier(humidifier)
 
-        await self._device.set_mode(gd_effect, gd_brightness, gd_volume)
+        await self._device.set_mode(gd_effect, gd_brightness, gd_volume, gd_humidifier)
 
         self.async_write_ha_state()
 
@@ -91,8 +95,9 @@ class GlowdreamingSensor(BTEntity, SensorEntity):
         gd_effect = GDEffect.AWAKE
         gd_brightness = GDBrightness(brightness)
         gd_volume = self._device.volume_level
+        gd_humidifier = self._device.humidifier
 
-        await self._device.set_mode(gd_effect, gd_brightness, gd_volume)
+        await self._device.set_mode(gd_effect, gd_brightness, gd_volume, gd_humidifier)
 
         self.async_write_ha_state()
 
@@ -102,8 +107,9 @@ class GlowdreamingSensor(BTEntity, SensorEntity):
         gd_effect = GDEffect.SLEEP
         gd_brightness = GDBrightness(brightness)
         gd_volume = self._device.volume_level
+        gd_humidifier = self._device.humidifier
 
-        await self._device.set_mode(gd_effect, gd_brightness, gd_volume)
+        await self._device.set_mode(gd_effect, gd_brightness, gd_volume, gd_humidifier)
 
         self.async_write_ha_state()
 
@@ -113,8 +119,9 @@ class GlowdreamingSensor(BTEntity, SensorEntity):
         gd_effect = self._device.effect
         gd_brightness = self._device.brightness_level
         gd_volume = GDVolume(volume)
+        gd_humidifier = self._device.humidifier
 
-        await self._device.set_mode(gd_effect, gd_brightness, gd_volume)
+        await self._device.set_mode(gd_effect, gd_brightness, gd_volume, gd_humidifier)
 
         self.async_write_ha_state()
 

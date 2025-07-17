@@ -38,6 +38,17 @@ set_mode:
             - Low
             - Medium
             - High
+    humidifier:
+      name: Humidifier
+      description: Humidifier
+      required: true
+      selector:
+        select:
+          options:
+            - None
+            - 2 Hours
+            - 4 Hours
+            - Continuous
 set_sleep_brightness:
   name: Set Sleep Brightness
   description: Set brightness

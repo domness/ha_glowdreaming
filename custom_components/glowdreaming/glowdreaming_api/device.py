@@ -56,6 +56,9 @@ class GlowdreamingDevice:
         self._volume = None
         self._brightness = None
         self._effect = None
+        self._humidifier = None
+        self._humidifier_timer = None
+        self._device_lock = None
 
     async def update(self):
         _LOGGER.debug("Update called")
@@ -88,6 +91,18 @@ class GlowdreamingDevice:
     @property
     def volume(self):
         return self._volume
+
+    @property
+    def humidifier(self):
+        return self._humidifier
+
+    @property
+    def humidifier_timer(self):
+        return self._humidifier_timer
+
+    @property
+    def device_lock(self):
+        return self._device_lock
 
     @property
     def volume_level(self) -> GDVolume:
@@ -176,9 +191,9 @@ class GlowdreamingDevice:
         self._refresh_data(data)
         return data
 
-    async def set_mode(self, effect: GDEffect, brightness: GDBrightness, volume: GDVolume):
+    async def set_mode(self, effect: GDEffect, brightness: GDBrightness, volume: GDVolume, humidifier: GDHumidifier):
         await self.get_client()
-        command = self.get_command_string(effect, brightness, volume)
+        command = self.get_command_string(effect, brightness, volume, humidifier)
         _LOGGER.debug(f"Setting mode {command}")
         await self.send_command(command)
 
@@ -210,22 +225,42 @@ class GlowdreamingDevice:
         else:
             effect = GDEffect.NONE
 
+        # Determine humidifier state based on the hex string
+        humidifier_on = int(response[4], 16)
+        humidifier_option = int(response[9], 16)
+        humidifier_timer = int(response[7], 16)
+
+        if humidifier_on == 1:
+            if humidifier_option == 1:
+                humidifier = GDHumidifier.TWO
+            elif humidifier_option == 2:
+                humidifier = GDHumidifier.FOUR
+            else:
+                humidifier = GDHumidifier.CONTINUOUS
+        else:
+            humidifier = GDHumidifier.NONE
+
         self._power = power
         self._volume = volume
         self._sound = GDSound.WHITE_NOISE
         self._effect = effect
         self._brightness = brightness
+        self._humidifier = humidifier
+        self._humidifier_timer = humidifier_timer
+        self._device_lock = None
 
-        self._mode = f"Power: {power}, Volume: {volume}, Brightness: {brightness}, Effect: {effect}"
+        self._mode = f"Power: {power}, Volume: {volume}, Brightness: {brightness}, Effect: {effect}, Humidifier: {humidifier}, Timer: {humidifier_timer}"
 
         _LOGGER.debug(f"Power state is {self._power}")
         _LOGGER.debug(f"Volume state is {self._volume}")
         _LOGGER.debug(f"Sound state is {self._sound}")
         _LOGGER.debug(f"Effect state is {self._effect}")
         _LOGGER.debug(f"Brightness state is {self._brightness}")
+        _LOGGER.debug(f"Humidifier state is {self._humidifier}")
+        _LOGGER.debug(f"Humidifier timer state is {self._humidifier_timer}")
 
-    def get_command_string(self, effect, brightness, volume):
-        _LOGGER.debug(f"Command string for: {effect}, {brightness}, {volume}")
+    def get_command_string(self, effect, brightness, volume, humidifier):
+        _LOGGER.debug(f"Command string for: {effect}, {brightness}, {volume}, {humidifier}")
 
         # 000000000000ffff0000 off
         # 0a0000000000ffff0000 red light 1
@@ -263,4 +298,15 @@ class GlowdreamingDevice:
             red_value = "00"
             green_value = "00"
 
-        return "{red_value}{green_value}00{volume_level}0000ffff0000".format(volume_level=volume_level, red_value=red_value, green_value=green_value)
+        if humidifier is GDHumidifier.TWO:
+            humidifier_value = "01000078"
+        elif humidifier is GDHumidifier.FOUR:
+            humidifier_value = "010000f0"
+        elif humidifier is GDHumidifier.CONTINUOUS:
+            humidifier_value = "1010ffff"
+        else:
+            humidifier_value = "0000ffff"
+
+        device_lock = "00" # or 01 if locked
+
+        return "{red_value}{green_value}00{volume_level}{humidifier_value}{device_lock}00".format(volume_level=volume_level, red_value=red_value, green_value=green_value, humidifier_value=humidifier_value, device_lock=device_lock)

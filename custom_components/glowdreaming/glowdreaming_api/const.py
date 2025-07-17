@@ -22,3 +22,9 @@ class GDVolume(StrEnum):
     LOW = "Low"
     MEDIUM = "Medium"
     HIGH = "High"
+
+class GDHumidifier(StrEnum):
+    NONE = "None"
+    TWO = "2 Hours"
+    FOUR = "4 Hours"
+    CONTINUOUS = "Continuous"

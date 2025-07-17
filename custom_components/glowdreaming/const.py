@@ -15,7 +15,8 @@ class Schema(Enum):
         {
             vol.Required("light_effect"): cv.string,
             vol.Required("brightness"): cv.string,
-            vol.Required("volume"): cv.string
+            vol.Required("volume"): cv.string,
+            vol.Required("humidifier"): cv.string
         }
     )
     SET_SLEEP_BRIGHTNESS = make_entity_service_schema(
