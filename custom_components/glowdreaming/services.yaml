@@ -87,6 +87,25 @@ set_awake_brightness:
             - Low
             - Medium
             - High
+set_humidifier:
+  name: Set Humidifier
+  description: Set humidifier
+  target:
+    entity:
+      domain: sensor
+      integration: glowdreaming
+  fields:
+    humidifier:
+      name: Humidifier
+      description: Humidifier
+      required: true
+      selector:
+        select:
+          options:
+            - None
+            - 2 Hours
+            - 4 Hours
+            - Continuous
 set_volume:
   name: Set Volume
   description: Set volume

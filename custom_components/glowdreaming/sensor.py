@@ -29,6 +29,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry, async_add_e
     platform.async_register_entity_service("set_sleep_brightness", Schema.SET_SLEEP_BRIGHTNESS.value, "set_sleep_brightness")
     platform.async_register_entity_service("set_awake_brightness", Schema.SET_AWAKE_BRIGHTNESS.value, "set_awake_brightness")
     platform.async_register_entity_service("set_volume", Schema.SET_VOLUME.value, "set_volume")
+    platform.async_register_entity_service("set_humidifier", Schema.SET_HUMIDIFIER.value, "set_humidifier")
 
 class GlowdreamingSensor(BTEntity, SensorEntity):
     """Representation of a Glowdreaming Sensor."""
@@ -108,6 +109,18 @@ class GlowdreamingSensor(BTEntity, SensorEntity):
         gd_brightness = GDBrightness(brightness)
         gd_volume = self._device.volume_level
         gd_humidifier = self._device.humidifier
+
+        await self._device.set_mode(gd_effect, gd_brightness, gd_volume, gd_humidifier)
+
+        self.async_write_ha_state()
+
+    async def set_humidifier(self, humidifier):
+        _LOGGER.debug("Setting humidifier to %s", humidifier)
+
+        gd_effect = self._device.effect
+        gd_brightness = self._device.brightness_level
+        gd_volume = self._device.volume_level
+        gd_humidifier = GDHumidifier(humidifier)
 
         await self._device.set_mode(gd_effect, gd_brightness, gd_volume, gd_humidifier)
 

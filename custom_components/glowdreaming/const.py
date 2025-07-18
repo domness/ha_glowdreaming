@@ -29,6 +29,11 @@ class Schema(Enum):
             vol.Required("brightness"): cv.string
         }
     )
+    SET_HUMIDIFIER = make_entity_service_schema(
+        {
+            vol.Required("humidifier"): cv.string
+        }
+    )
     SET_VOLUME = make_entity_service_schema(
         {
             vol.Required("volume"): cv.string
