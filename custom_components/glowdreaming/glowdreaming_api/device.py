@@ -207,11 +207,21 @@ class GlowdreamingDevice:
 
     def _refresh_data(self, response_data) -> None:
         _LOGGER.debug(f"Glowdreaming Hex {response_data}")
-        hex_str = response_data.hex()
 
+        # Handle empty or None response data
+        if not response_data or len(response_data) == 0:
+            _LOGGER.warning("Received empty response data from device")
+            return
+
+        hex_str = response_data.hex()
         self._mode_hex = hex_str
 
         response = [hex(x) for x in response_data]
+
+        # Check if response has enough data to prevent IndexError
+        if len(response) < 10:
+            _LOGGER.warning(f"Received incomplete response data: {len(response)} bytes, expected at least 10. Raw data: {hex_str}")
+            return
 
         power = bool(4 & int(response[9], 16)) # 4 is on
         volume = int(response[3], 16)
