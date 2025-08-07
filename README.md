@@ -11,8 +11,9 @@
 
 ## Screenshots
 
-<img width="989" alt="Screenshot 2025-03-11 at 20 58 56" src="https://github.com/user-attachments/assets/90de730a-f100-4d02-9ad7-e5b6e5c36958" />
-<img width="1035" alt="Screenshot 2025-03-11 at 20 59 32" src="https://github.com/user-attachments/assets/fccd1e6b-6dee-47a4-abed-06a287a2bb8b" />
+<img width="391" height="592" alt="Screenshot 2025-08-07 at 22 49 04" src="https://github.com/user-attachments/assets/557f8aeb-b540-44a2-9486-2d2deaff4157" />
+<img width="1106" height="783" alt="Screenshot 2025-08-07 at 22 50 01" src="https://github.com/user-attachments/assets/bb54db62-adf7-446a-ae16-955f54701691" />
+
 
 ## What you need
 
