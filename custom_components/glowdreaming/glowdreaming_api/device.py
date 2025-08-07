@@ -187,7 +187,6 @@ class GlowdreamingDevice:
         uuid = UUID(uuid_str)
         data = await self._client.read_gatt_char(uuid)
         _LOGGER.debug(f"Reading Gatt {data}")
-        print(data)
         self._refresh_data(data)
         return data
 
@@ -224,16 +223,29 @@ class GlowdreamingDevice:
             return
 
         power = bool(4 & int(response[9], 16)) # 4 is on
+        self._power = power
+        _LOGGER.debug(f"Power state is {self._power}")
+
         volume = int(response[3], 16)
+        self._volume = volume
+        _LOGGER.debug(f"Volume state is {self._volume}")
+
+        self._sound = GDSound.WHITE_NOISE
+        _LOGGER.debug(f"Sound state is {self._sound}")
 
         red, green, blue = [int(x, 16) for x in response[0:3]]
         brightness = max(red, green, blue)
+        self._brightness = brightness
+        _LOGGER.debug(f"Brightness state is {self._brightness}")
+
         if red > 0:
             effect = GDEffect.SLEEP
         elif green > 0:
             effect = GDEffect.AWAKE
         else:
             effect = GDEffect.NONE
+        self._effect = effect
+        _LOGGER.debug(f"Effect state is {self._effect}")
 
         # Determine humidifier state based on the hex string
         humidifier_on = int(response[4], 16)
@@ -250,24 +262,13 @@ class GlowdreamingDevice:
         else:
             humidifier = GDHumidifier.NONE
 
-        self._power = power
-        self._volume = volume
-        self._sound = GDSound.WHITE_NOISE
-        self._effect = effect
-        self._brightness = brightness
         self._humidifier = humidifier
         self._humidifier_timer = humidifier_timer
+        _LOGGER.debug(f"Humidifier state is {self._humidifier}")
+        _LOGGER.debug(f"Humidifier timer state is {self._humidifier_timer}")
         self._device_lock = None
 
         self._mode = f"Power: {power}, Volume: {volume}, Brightness: {brightness}, Effect: {effect}, Humidifier: {humidifier}, Timer: {humidifier_timer}"
-
-        _LOGGER.debug(f"Power state is {self._power}")
-        _LOGGER.debug(f"Volume state is {self._volume}")
-        _LOGGER.debug(f"Sound state is {self._sound}")
-        _LOGGER.debug(f"Effect state is {self._effect}")
-        _LOGGER.debug(f"Brightness state is {self._brightness}")
-        _LOGGER.debug(f"Humidifier state is {self._humidifier}")
-        _LOGGER.debug(f"Humidifier timer state is {self._humidifier_timer}")
 
     def get_command_string(self, effect, brightness, volume, humidifier):
         _LOGGER.debug(f"Command string for: {effect}, {brightness}, {volume}, {humidifier}")
