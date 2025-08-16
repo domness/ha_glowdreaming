@@ -30,6 +30,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry, async_add_e
     platform.async_register_entity_service("set_awake_brightness", Schema.SET_AWAKE_BRIGHTNESS.value, "set_awake_brightness")
     platform.async_register_entity_service("set_volume", Schema.SET_VOLUME.value, "set_volume")
     platform.async_register_entity_service("set_humidifier", Schema.SET_HUMIDIFIER.value, "set_humidifier")
+    platform.async_register_entity_service("refresh_state", Schema.REFRESH_STATE.value, "refresh_state")
 
 class GlowdreamingSensor(BTEntity, SensorEntity):
     """Representation of a Glowdreaming Sensor."""
@@ -136,6 +137,11 @@ class GlowdreamingSensor(BTEntity, SensorEntity):
 
         await self._device.set_mode(gd_effect, gd_brightness, gd_volume, gd_humidifier)
 
+        self.async_write_ha_state()
+
+    async def refresh_state(self):
+        _LOGGER.debug("Refreshing state")
+        await self._device.update()
         self.async_write_ha_state()
 
     async def write_gatt(self, target_uuid, data):

@@ -159,3 +159,10 @@ read_gatt:
       required: true
       selector:
         text:
+refresh_state:
+  name: Refresh
+  description: Refresh the Glow Dreaming device state
+  target:
+    entity:
+      domain: sensor
+      integration: glowdreaming

@@ -50,3 +50,4 @@ class Schema(Enum):
             vol.Required("target_uuid"): cv.string
         }
     )
+    REFRESH_STATE = make_entity_service_schema({})

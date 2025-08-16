@@ -62,8 +62,13 @@ class GlowdreamingDevice:
 
     async def update(self):
         _LOGGER.debug("Update called")
-        response = await self.read_gatt(CHAR_CHARACTERISTIC)
-        self._refresh_data(response)
+        # Prefer notifications for freshest data; fall back to fresh read
+        try:
+            await self.subscribe_and_refresh()
+            return
+        except Exception:
+            _LOGGER.debug("Notify-based refresh failed or unsupported; falling back to read_fresh()", exc_info=True)
+            await self.read_fresh()
 
     async def stop(self):
         pass
@@ -187,6 +192,54 @@ class GlowdreamingDevice:
         uuid = UUID(uuid_str)
         data = await self._client.read_gatt_char(uuid)
         _LOGGER.debug(f"Reading Gatt {data}")
+        self._refresh_data(data)
+        return data
+
+    async def subscribe_and_refresh(self):
+        """Start notify on the characteristic and wait briefly for an update.
+
+        Some devices only push current state via notifications. We subscribe,
+        wait up to a short timeout for a packet, then stop notifications.
+        """
+        await self.get_client()
+        uuid = UUID("{" + CHAR_CHARACTERISTIC + "}")
+
+        update_event = asyncio.Event()
+
+        def _handler(_sender, data: bytearray):
+            self._refresh_data(data)
+            # Signal that we got at least one notification
+            if not update_event.is_set():
+                update_event.set()
+
+        try:
+            await self._client.start_notify(uuid, _handler)
+            try:
+                await asyncio.wait_for(update_event.wait(), timeout=1.0)
+            except asyncio.TimeoutError:
+                _LOGGER.debug("No notification received within timeout; notify may be idle")
+            finally:
+                # Stop notify if we only wanted a one-shot refresh
+                try:
+                    await self._client.stop_notify(uuid)
+                except Exception:
+                    _LOGGER.debug("stop_notify failed", exc_info=True)
+        except Exception:
+            # Propagate to let caller fall back
+            raise
+
+
+    async def read_fresh(self):
+        """Force a fresh read, retrying once after a short delay if needed."""
+        await self.get_client()
+        uuid = UUID("{" + CHAR_CHARACTERISTIC + "}")
+
+        data = await self._client.read_gatt_char(uuid)
+        # If the device sometimes lags, try a second read shortly after
+        await asyncio.sleep(0.5)
+        data = await self._client.read_gatt_char(uuid)
+
+        _LOGGER.debug(f"Fresh read Gatt {data}")
         self._refresh_data(data)
         return data
 
