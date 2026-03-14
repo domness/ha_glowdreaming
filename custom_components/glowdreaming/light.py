@@ -61,7 +61,11 @@ class GlowdreamingLight(BTEntity, LightEntity):
         """Turn on the light, optionally with a specific effect."""
         effect_name = kwargs.get(ATTR_EFFECT)
         if effect_name:
-            effect = GDEffect(effect_name)
+            try:
+                effect = GDEffect(effect_name)
+            except ValueError:
+                _LOGGER.warning("Ignoring unknown effect %r; restoring last known effect", effect_name)
+                effect = self._device.last_effect or GDEffect.SLEEP
         else:
             effect = self._device.effect
             if effect is None or effect == GDEffect.NONE:
