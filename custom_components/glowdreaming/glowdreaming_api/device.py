@@ -53,6 +53,7 @@ class GlowdreamingDevice:
         self._mode: str = "unknown" # Temporary
 
         self._power = None
+        self._sound = None
         self._volume = None
         self._brightness = None
         self._effect = None
@@ -92,7 +93,7 @@ class GlowdreamingDevice:
         return self._power
 
     @property
-    def sound(self) -> GDSound:
+    def sound(self) -> GDSound | None:
         return self._sound
 
     @property
