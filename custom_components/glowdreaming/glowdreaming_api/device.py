@@ -57,6 +57,7 @@ class GlowdreamingDevice:
         self._brightness = None
         self._effect = None
         self._last_effect = None
+        self._last_brightness = None
         self._humidifier = None
         self._humidifier_timer = None
         self._device_lock = None
@@ -147,6 +148,10 @@ class GlowdreamingDevice:
     @property
     def last_effect(self):
         return self._last_effect
+
+    @property
+    def last_brightness(self):
+        return self._last_brightness
 
     async def get_client(self):
         def disconnected_callback(client):
@@ -294,6 +299,8 @@ class GlowdreamingDevice:
         red, green, blue = [int(x, 16) for x in response[0:3]]
         brightness = max(red, green, blue)
         self._brightness = brightness
+        if brightness > 0:
+            self._last_brightness = self.brightness_level
         _LOGGER.debug(f"Brightness state is {self._brightness}")
 
         if red > 0:

@@ -69,7 +69,7 @@ class GlowdreamingLight(BTEntity, LightEntity):
 
         brightness = self._device.brightness_level
         if brightness == GDBrightness.NONE:
-            brightness = GDBrightness.LOW
+            brightness = self._device.last_brightness or GDBrightness.LOW
 
         await self._device.set_mode(effect, brightness, self._device.volume_level, self._device.humidifier)
         self.async_write_ha_state()
