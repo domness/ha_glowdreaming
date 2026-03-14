@@ -41,10 +41,6 @@ class GlowdreamingSensor(BTEntity, SensorEntity):
         """Initialize the Device."""
         super().__init__(coordinator)
 
-        self._attributes = {
-            "mode_hex": "UNKNOWN"
-        }
-
     def connection_state(self) -> str:
         """Return a human-readable connection state string."""
         if self._device.connected:
@@ -61,7 +57,6 @@ class GlowdreamingSensor(BTEntity, SensorEntity):
     def extra_state_attributes(self):
         """Return the state attributes of the sensor."""
         return {
-            **self._attributes,
             "connected": self.connection_state(),
             "volume": self._device.volume,
             "effect": self._device.effect,
@@ -144,5 +139,4 @@ class GlowdreamingSensor(BTEntity, SensorEntity):
 
     async def read_gatt(self, target_uuid):
         await self._device.read_gatt(target_uuid)
-        self._attributes['mode_hex'] = self._device.mode_hex
         self.async_write_ha_state()
