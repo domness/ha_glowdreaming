@@ -56,6 +56,7 @@ class GlowdreamingDevice:
         self._volume = None
         self._brightness = None
         self._effect = None
+        self._last_effect = None
         self._humidifier = None
         self._humidifier_timer = None
         self._device_lock = None
@@ -142,6 +143,10 @@ class GlowdreamingDevice:
     @property
     def effect(self):
         return self._effect
+
+    @property
+    def last_effect(self):
+        return self._last_effect
 
     async def get_client(self):
         def disconnected_callback(client):
@@ -298,6 +303,8 @@ class GlowdreamingDevice:
         else:
             effect = GDEffect.NONE
         self._effect = effect
+        if effect != GDEffect.NONE:
+            self._last_effect = effect
         _LOGGER.debug(f"Effect state is {self._effect}")
 
         # Determine humidifier state based on the hex string

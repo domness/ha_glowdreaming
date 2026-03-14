@@ -65,7 +65,7 @@ class GlowdreamingLight(BTEntity, LightEntity):
         else:
             effect = self._device.effect
             if effect is None or effect == GDEffect.NONE:
-                effect = GDEffect.SLEEP
+                effect = self._device.last_effect or GDEffect.SLEEP
 
         brightness = self._device.brightness_level
         if brightness == GDBrightness.NONE:
