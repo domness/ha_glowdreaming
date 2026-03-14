@@ -1,8 +1,6 @@
 """Support for Glowdreaming media player (sound/volume)."""
 from __future__ import annotations
 
-import logging
-
 from homeassistant.components.media_player import (
     MediaPlayerDeviceClass,
     MediaPlayerEntity,
@@ -17,7 +15,6 @@ from .entity import BTEntity
 from .coordinator import BTCoordinator
 from .const import DOMAIN
 
-_LOGGER = logging.getLogger(__name__)
 PARALLEL_UPDATES = 0
 
 
