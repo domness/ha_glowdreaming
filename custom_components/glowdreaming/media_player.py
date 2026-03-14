@@ -1,7 +1,11 @@
+"""Support for Glowdreaming media player (sound/volume)."""
+from __future__ import annotations
+
+import logging
+
 from homeassistant.components.media_player import (
     MediaPlayerDeviceClass,
     MediaPlayerEntity,
-    MediaPlayerEntityFeature,
     MediaPlayerState,
 )
 from homeassistant.config_entries import ConfigEntry
@@ -11,63 +15,57 @@ from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from .glowdreaming_api.const import GDSound
 from .entity import BTEntity
 from .coordinator import BTCoordinator
-from .const import *
+from .const import DOMAIN
+
+_LOGGER = logging.getLogger(__name__)
+PARALLEL_UPDATES = 0
+
 
 async def async_setup_entry(
     hass: HomeAssistant,
     config_entry: ConfigEntry,
     async_add_entities: AddEntitiesCallback,
 ) -> None:
+    """Set up Glowdreaming media player based on a config entry."""
     coordinator = hass.data[DOMAIN][config_entry.entry_id]
     async_add_entities([GlowdreamingMediaPlayer(coordinator)], True)
 
 
 class GlowdreamingMediaPlayer(BTEntity, MediaPlayerEntity):
-    """Representation of a Glowdreaming Media Player."""
+    """Representation of a Glowdreaming Media Player (sound output)."""
+
+    _attr_name = "Sound"
+    _attr_device_class = MediaPlayerDeviceClass.SPEAKER
 
     def __init__(self, coordinator: BTCoordinator) -> None:
         """Initialize the Device."""
         super().__init__(coordinator)
 
-        self._name = "Sound"
-
-    @property
-    def name(self):
-        return self._name
-
-    # @property
-    # def supported_features(self) -> MediaPlayerEntityFeature:
-    #     return (
-    #         MediaPlayerEntityFeature.PLAY
-    #         | MediaPlayerEntityFeature.STOP
-    #         | MediaPlayerEntityFeature.VOLUME_SET
-    #         | MediaPlayerEntityFeature.SELECT_SOURCE
-    #         | MediaPlayerEntityFeature.TURN_ON
-    #         | MediaPlayerEntityFeature.TURN_OFF
-    #     )
-
-    @property
-    def device_class(self) -> MediaPlayerDeviceClass | None:
-        return MediaPlayerDeviceClass.SPEAKER
-
     @property
     def source_list(self) -> list[str] | None:
+        """Return list of available sound sources."""
         return [sound.name.capitalize() for sound in GDSound]
 
     @property
     def state(self) -> MediaPlayerState | None:
+        """Return the playback state."""
+        if self._device.volume is None:
+            return None
         if self._device.volume > 0:
             return MediaPlayerState.PLAYING
         return MediaPlayerState.OFF
 
     @property
     def source(self) -> str | None:
-        return self._device.sound.name.capitalize()
+        """Return the current sound source."""
+        sound = getattr(self._device, '_sound', None)
+        if sound is None:
+            return None
+        return sound.name.capitalize()
 
     @property
     def volume_level(self) -> float | None:
+        """Return volume level as a float 0.0–1.0."""
+        if self._device.volume is None:
+            return None
         return float(self._device.volume / 3)
-
-    # async def async_set_volume_level(self, volume):
-    #     await self._device.set_volume(int(255 * volume))
-    #     self.async_write_ha_state()
