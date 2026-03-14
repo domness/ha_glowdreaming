@@ -49,8 +49,11 @@ class GlowdreamingLight(BTEntity, LightEntity):
 
     @property
     def effect(self) -> str | None:
-        """Return the current light effect."""
-        return self._device.effect
+        """Return the current light effect, or None when the light is off."""
+        e = self._device.effect
+        if e is None or e == GDEffect.NONE:
+            return None
+        return e
 
     @property
     def effect_list(self) -> list[str]:
