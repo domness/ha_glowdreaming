@@ -37,15 +37,6 @@ class TestSupportedFeatures:
         entity = make_player(mock_device, mock_coordinator)
         assert entity._attr_supported_features & MediaPlayerEntityFeature.PLAY
 
-    def test_has_turn_on(self, mock_device, mock_coordinator):
-        entity = make_player(mock_device, mock_coordinator)
-        assert entity._attr_supported_features & MediaPlayerEntityFeature.TURN_ON
-
-    def test_has_turn_off(self, mock_device, mock_coordinator):
-        entity = make_player(mock_device, mock_coordinator)
-        assert entity._attr_supported_features & MediaPlayerEntityFeature.TURN_OFF
-
-
 class TestMediaContentType:
     def test_content_type_is_music(self, mock_device, mock_coordinator):
         entity = make_player(mock_device, mock_coordinator)
@@ -71,11 +62,11 @@ class TestState:
         entity = make_player(mock_device, mock_coordinator)
         assert entity.state == MediaPlayerState.PLAYING
 
-    def test_off_when_volume_zero_not_paused(self, mock_device, mock_coordinator):
+    def test_idle_when_volume_zero_not_paused(self, mock_device, mock_coordinator):
         mock_device.volume = 0
         entity = make_player(mock_device, mock_coordinator)
         entity._paused = False
-        assert entity.state == MediaPlayerState.OFF
+        assert entity.state == MediaPlayerState.IDLE
 
     def test_paused_when_volume_zero_and_paused(self, mock_device, mock_coordinator):
         mock_device.volume = 0
@@ -290,44 +281,3 @@ class TestSetVolumeLevel:
         await entity.async_set_volume_level(0.5)
         entity.async_write_ha_state.assert_called_once()
 
-
-# ---------------------------------------------------------------------------
-# async_turn_on / async_turn_off
-# ---------------------------------------------------------------------------
-
-class TestTurnOnOff:
-    @pytest.mark.asyncio
-    async def test_turn_on_restores_volume(self, mock_device, mock_coordinator):
-        entity = make_player(mock_device, mock_coordinator)
-        entity._last_volume = GDVolume.MEDIUM
-        await entity.async_turn_on()
-        mock_device.set_mode.assert_called_once_with(
-            mock_device.effect,
-            mock_device.brightness_level,
-            GDVolume.MEDIUM,
-            mock_device.humidifier,
-        )
-
-    @pytest.mark.asyncio
-    async def test_turn_off_sets_volume_none(self, mock_device, mock_coordinator):
-        entity = make_player(mock_device, mock_coordinator)
-        await entity.async_turn_off()
-        mock_device.set_mode.assert_called_once_with(
-            mock_device.effect,
-            mock_device.brightness_level,
-            GDVolume.NONE,
-            mock_device.humidifier,
-        )
-
-    @pytest.mark.asyncio
-    async def test_turn_off_clears_paused_flag(self, mock_device, mock_coordinator):
-        entity = make_player(mock_device, mock_coordinator)
-        entity._paused = True
-        await entity.async_turn_off()
-        assert entity._paused is False
-
-    @pytest.mark.asyncio
-    async def test_turn_off_writes_ha_state(self, mock_device, mock_coordinator):
-        entity = make_player(mock_device, mock_coordinator)
-        await entity.async_turn_off()
-        entity.async_write_ha_state.assert_called_once()

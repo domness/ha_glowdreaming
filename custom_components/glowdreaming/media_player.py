@@ -39,8 +39,6 @@ class GlowdreamingMediaPlayer(BTEntity, MediaPlayerEntity):
         MediaPlayerEntityFeature.VOLUME_SET
         | MediaPlayerEntityFeature.PAUSE
         | MediaPlayerEntityFeature.PLAY
-        | MediaPlayerEntityFeature.TURN_ON
-        | MediaPlayerEntityFeature.TURN_OFF
     )
     _attr_media_content_type = MediaType.MUSIC
     _attr_media_title = "White Noise"
@@ -65,7 +63,7 @@ class GlowdreamingMediaPlayer(BTEntity, MediaPlayerEntity):
             return MediaPlayerState.PLAYING
         if self._paused:
             return MediaPlayerState.PAUSED
-        return MediaPlayerState.OFF
+        return MediaPlayerState.IDLE
 
     @property
     def source(self) -> str | None:
@@ -81,21 +79,6 @@ class GlowdreamingMediaPlayer(BTEntity, MediaPlayerEntity):
         if self._device.volume is None:
             return None
         return float(self._device.volume / 3)
-
-    async def async_turn_on(self) -> None:
-        """Turn on sound by restoring the last known volume."""
-        await self.async_media_play()
-
-    async def async_turn_off(self) -> None:
-        """Turn off sound by setting volume to none."""
-        self._paused = False
-        await self._device.set_mode(
-            self._device.effect,
-            self._device.brightness_level,
-            GDVolume.NONE,
-            self._device.humidifier,
-        )
-        self.async_write_ha_state()
 
     async def async_media_pause(self) -> None:
         """Pause playback by muting the volume, preserving state for resume."""
