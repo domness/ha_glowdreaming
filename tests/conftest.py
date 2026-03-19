@@ -73,6 +73,12 @@ class _MediaPlayerEntityFeature:
     VOLUME_SET = 4
     PAUSE = 1
     PLAY = 16384
+    TURN_ON = 128
+    TURN_OFF = 256
+
+
+class _MediaType:
+    MUSIC = "music"
 
 
 ATTR_EFFECT = "effect"
@@ -98,6 +104,7 @@ _mp_mod.MediaPlayerEntity = _MediaPlayerEntity
 _mp_mod.MediaPlayerState = _MediaPlayerState
 _mp_mod.MediaPlayerDeviceClass = _MediaPlayerDeviceClass
 _mp_mod.MediaPlayerEntityFeature = _MediaPlayerEntityFeature
+_mp_mod.MediaType = _MediaType
 
 _coord_mod = MagicMock()
 _coord_mod.CoordinatorEntity = _CoordinatorEntity
