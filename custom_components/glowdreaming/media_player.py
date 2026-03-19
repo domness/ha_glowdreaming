@@ -31,7 +31,12 @@ async def async_setup_entry(
 
 
 class GlowdreamingMediaPlayer(BTEntity, MediaPlayerEntity):
-    """Representation of a Glowdreaming Media Player (sound output)."""
+    """Representation of a Glowdreaming Media Player (sound output).
+
+    The device only has sound on/off (controlled by volume level); there is
+    no hardware pause state.  PLAYING = sound on, IDLE = sound off.
+    The play action restores the last-used volume; pause sets volume to zero.
+    """
 
     _attr_name = "Sound"
     _attr_device_class = MediaPlayerDeviceClass.SPEAKER
@@ -46,7 +51,6 @@ class GlowdreamingMediaPlayer(BTEntity, MediaPlayerEntity):
     def __init__(self, coordinator: BTCoordinator) -> None:
         """Initialize the Device."""
         super().__init__(coordinator)
-        self._paused = False
         self._last_volume = GDVolume.LOW
 
     @property
@@ -56,13 +60,11 @@ class GlowdreamingMediaPlayer(BTEntity, MediaPlayerEntity):
 
     @property
     def state(self) -> MediaPlayerState | None:
-        """Return the playback state."""
+        """Return PLAYING when volume > 0, IDLE when silent, None if unknown."""
         if self._device.volume is None:
             return None
         if self._device.volume > 0:
             return MediaPlayerState.PLAYING
-        if self._paused:
-            return MediaPlayerState.PAUSED
         return MediaPlayerState.IDLE
 
     @property
@@ -81,10 +83,9 @@ class GlowdreamingMediaPlayer(BTEntity, MediaPlayerEntity):
         return float(self._device.volume / 3)
 
     async def async_media_pause(self) -> None:
-        """Pause playback by muting the volume, preserving state for resume."""
+        """Turn sound off, saving the current volume for later resumption."""
         if self._device.volume_level != GDVolume.NONE:
             self._last_volume = self._device.volume_level
-        self._paused = True
         await self._device.set_mode(
             self._device.effect,
             self._device.brightness_level,
@@ -94,8 +95,7 @@ class GlowdreamingMediaPlayer(BTEntity, MediaPlayerEntity):
         self.async_write_ha_state()
 
     async def async_media_play(self) -> None:
-        """Resume playback at the last known volume level."""
-        self._paused = False
+        """Turn sound on at the last known volume level."""
         volume = self._last_volume if self._last_volume != GDVolume.NONE else GDVolume.LOW
         await self._device.set_mode(
             self._device.effect,
@@ -107,7 +107,6 @@ class GlowdreamingMediaPlayer(BTEntity, MediaPlayerEntity):
 
     async def async_set_volume_level(self, volume: float) -> None:
         """Set the volume level (0.0–1.0) mapped to device Low/Medium/High."""
-        self._paused = False
         if volume <= 0:
             gd_volume = GDVolume.NONE
         elif volume <= 1 / 3:
