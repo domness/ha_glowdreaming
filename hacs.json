@@ -1,7 +1,7 @@
 {
   "name": "Glowdreaming",
   "content_in_root": false,
-  "hacs": "1.6.0",
-  "homeassistant": "2025.2.5",
+  "hacs": "2.0.0",
+  "homeassistant": "2025.12.4",
   "render_readme": true
 }
