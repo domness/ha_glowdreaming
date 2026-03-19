@@ -35,39 +35,28 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry, async_add_e
 class GlowdreamingSensor(BTEntity, SensorEntity):
     """Representation of a Glowdreaming Sensor."""
 
+    _attr_name = "Sensor"
+
     def __init__(self, coordinator: BTCoordinator) -> None:
         """Initialize the Device."""
         super().__init__(coordinator)
 
-        self._name = "Sensor"
-        self._attributes = {
-            "mode_hex": "UNKNOWN"
-        }
-
-    def connection_state(self):
+    def connection_state(self) -> str:
+        """Return a human-readable connection state string."""
         if self._device.connected:
             return "Connected"
         else:
             return "Disconnected"
 
     @property
-    def name(self):
-        return self._name
-
-    @property
-    def is_on(self):
-        return self._device.connected
-
-    @property
-    def state(self):
+    def native_value(self) -> str | None:
         """Return the state of the sensor."""
-        return self._device._mode
+        return self._device.mode
 
     @property
     def extra_state_attributes(self):
         """Return the state attributes of the sensor."""
         return {
-            **self._attributes,
             "connected": self.connection_state(),
             "volume": self._device.volume,
             "effect": self._device.effect,
@@ -75,8 +64,8 @@ class GlowdreamingSensor(BTEntity, SensorEntity):
             "humidifier": self._device.humidifier,
             "humidifier_timer": self._device.humidifier_timer,
             "device_lock": self._device.device_lock,
-            "mode": self._device._mode,
-            "mode_hex": self._device._mode_hex
+            "mode": self._device.mode,
+            "mode_hex": self._device.mode_hex,
         }
 
     async def set_mode(self, light_effect, brightness, volume, humidifier):
@@ -150,5 +139,4 @@ class GlowdreamingSensor(BTEntity, SensorEntity):
 
     async def read_gatt(self, target_uuid):
         await self._device.read_gatt(target_uuid)
-        self._attributes['mode_hex'] = self._device._mode_hex
         self.async_write_ha_state()
