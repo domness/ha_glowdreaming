@@ -51,6 +51,7 @@ class _UpdateFailed(Exception):
 
 class _ColorMode:
     ONOFF = "onoff"
+    BRIGHTNESS = "brightness"
 
 
 class _LightEntityFeature:
@@ -74,8 +75,11 @@ ATTR_EFFECT = "effect"
 # Build mock modules
 # ---------------------------------------------------------------------------
 
+ATTR_BRIGHTNESS = "brightness"
+
 _light_mod = MagicMock()
 _light_mod.LightEntity = _LightEntity
+_light_mod.ATTR_BRIGHTNESS = ATTR_BRIGHTNESS
 _light_mod.ATTR_EFFECT = ATTR_EFFECT
 _light_mod.ColorMode = _ColorMode
 _light_mod.LightEntityFeature = _LightEntityFeature

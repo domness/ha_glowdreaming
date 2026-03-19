@@ -4,6 +4,7 @@ from __future__ import annotations
 import logging
 
 from homeassistant.components.light import (
+    ATTR_BRIGHTNESS,
     ATTR_EFFECT,
     ColorMode,
     LightEntity,
@@ -32,9 +33,12 @@ class GlowdreamingLight(BTEntity, LightEntity):
     """Representation of a Glowdreaming Light."""
 
     _attr_name = "Light"
-    _attr_color_mode = ColorMode.ONOFF
-    _attr_supported_color_modes = {ColorMode.ONOFF}
+    _attr_color_mode = ColorMode.BRIGHTNESS
+    _attr_supported_color_modes = {ColorMode.BRIGHTNESS}
     _attr_supported_features = LightEntityFeature.EFFECT
+
+    # Maps device raw brightness values to HA 0-255 scale (3 discrete levels)
+    _BRIGHTNESS_TO_HA = {10: 85, 40: 170, 100: 255}
 
     def __init__(self, coordinator: BTCoordinator) -> None:
         """Initialize the Device."""
@@ -46,6 +50,14 @@ class GlowdreamingLight(BTEntity, LightEntity):
         if self._device.brightness is None:
             return None
         return self._device.brightness > 0
+
+    @property
+    def brightness(self) -> int | None:
+        """Return brightness in 0-255 scale mapped from the 3 device levels."""
+        raw = self._device.brightness
+        if raw is None:
+            return None
+        return self._BRIGHTNESS_TO_HA.get(raw, 0)
 
     @property
     def effect(self) -> str | None:
@@ -74,9 +86,18 @@ class GlowdreamingLight(BTEntity, LightEntity):
             if effect is None or effect == GDEffect.NONE:
                 effect = self._device.last_effect or GDEffect.SLEEP
 
-        brightness = self._device.brightness_level
-        if brightness == GDBrightness.NONE:
-            brightness = self._device.last_brightness or GDBrightness.LOW
+        ha_brightness = kwargs.get(ATTR_BRIGHTNESS)
+        if ha_brightness is not None:
+            if ha_brightness <= 85:
+                brightness = GDBrightness.LOW
+            elif ha_brightness <= 170:
+                brightness = GDBrightness.MEDIUM
+            else:
+                brightness = GDBrightness.HIGH
+        else:
+            brightness = self._device.brightness_level
+            if brightness == GDBrightness.NONE:
+                brightness = self._device.last_brightness or GDBrightness.LOW
 
         await self._device.set_mode(effect, brightness, self._device.volume_level, self._device.humidifier)
         self.async_write_ha_state()
