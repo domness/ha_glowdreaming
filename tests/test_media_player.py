@@ -4,7 +4,7 @@ from __future__ import annotations
 import pytest
 from unittest.mock import MagicMock, AsyncMock
 
-from homeassistant.components.media_player import MediaPlayerState, MediaPlayerEntityFeature
+from homeassistant.components.media_player import MediaPlayerState, MediaPlayerEntityFeature, MediaType
 
 from custom_components.glowdreaming.media_player import GlowdreamingMediaPlayer
 from custom_components.glowdreaming.glowdreaming_api.const import GDSound, GDVolume
@@ -36,6 +36,24 @@ class TestSupportedFeatures:
     def test_has_play(self, mock_device, mock_coordinator):
         entity = make_player(mock_device, mock_coordinator)
         assert entity._attr_supported_features & MediaPlayerEntityFeature.PLAY
+
+    def test_has_turn_on(self, mock_device, mock_coordinator):
+        entity = make_player(mock_device, mock_coordinator)
+        assert entity._attr_supported_features & MediaPlayerEntityFeature.TURN_ON
+
+    def test_has_turn_off(self, mock_device, mock_coordinator):
+        entity = make_player(mock_device, mock_coordinator)
+        assert entity._attr_supported_features & MediaPlayerEntityFeature.TURN_OFF
+
+
+class TestMediaContentType:
+    def test_content_type_is_music(self, mock_device, mock_coordinator):
+        entity = make_player(mock_device, mock_coordinator)
+        assert entity._attr_media_content_type == MediaType.MUSIC
+
+    def test_media_title_is_set(self, mock_device, mock_coordinator):
+        entity = make_player(mock_device, mock_coordinator)
+        assert entity._attr_media_title is not None
 
 
 # ---------------------------------------------------------------------------
@@ -270,4 +288,46 @@ class TestSetVolumeLevel:
     async def test_writes_ha_state(self, mock_device, mock_coordinator):
         entity = make_player(mock_device, mock_coordinator)
         await entity.async_set_volume_level(0.5)
+        entity.async_write_ha_state.assert_called_once()
+
+
+# ---------------------------------------------------------------------------
+# async_turn_on / async_turn_off
+# ---------------------------------------------------------------------------
+
+class TestTurnOnOff:
+    @pytest.mark.asyncio
+    async def test_turn_on_restores_volume(self, mock_device, mock_coordinator):
+        entity = make_player(mock_device, mock_coordinator)
+        entity._last_volume = GDVolume.MEDIUM
+        await entity.async_turn_on()
+        mock_device.set_mode.assert_called_once_with(
+            mock_device.effect,
+            mock_device.brightness_level,
+            GDVolume.MEDIUM,
+            mock_device.humidifier,
+        )
+
+    @pytest.mark.asyncio
+    async def test_turn_off_sets_volume_none(self, mock_device, mock_coordinator):
+        entity = make_player(mock_device, mock_coordinator)
+        await entity.async_turn_off()
+        mock_device.set_mode.assert_called_once_with(
+            mock_device.effect,
+            mock_device.brightness_level,
+            GDVolume.NONE,
+            mock_device.humidifier,
+        )
+
+    @pytest.mark.asyncio
+    async def test_turn_off_clears_paused_flag(self, mock_device, mock_coordinator):
+        entity = make_player(mock_device, mock_coordinator)
+        entity._paused = True
+        await entity.async_turn_off()
+        assert entity._paused is False
+
+    @pytest.mark.asyncio
+    async def test_turn_off_writes_ha_state(self, mock_device, mock_coordinator):
+        entity = make_player(mock_device, mock_coordinator)
+        await entity.async_turn_off()
         entity.async_write_ha_state.assert_called_once()
