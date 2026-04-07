@@ -1,5 +1,7 @@
 # Home Assistant - Glow Dreaming
 
+[![Tests](https://github.com/domness/ha_glowdreaming/actions/workflows/tests.yml/badge.svg)](https://github.com/domness/ha_glowdreaming/actions/workflows/tests.yml)
+
 [![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=domness&repository=ha_glowdreaming&category=Integration)
 
 - Manage your Glow Dreaming device in [Home Assistant](https://home-assistant.io/).
