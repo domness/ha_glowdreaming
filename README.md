@@ -2,6 +2,7 @@
 
 [![Tests](https://github.com/domness/ha_glowdreaming/actions/workflows/tests.yml/badge.svg)](https://github.com/domness/ha_glowdreaming/actions/workflows/tests.yml)
 [![Validate with hassfest](https://github.com/domness/ha_glowdreaming/actions/workflows/validate_with_hass.yml/badge.svg)](https://github.com/domness/ha_glowdreaming/actions/workflows/validate_with_hass.yml)
+[![HACS Action](https://github.com/domness/ha_glowdreaming/actions/workflows/hacs_action.yml/badge.svg)](https://github.com/domness/ha_glowdreaming/actions/workflows/hacs_action.yml)
 
 [![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=domness&repository=ha_glowdreaming&category=Integration)
 
